@@ -3166,6 +3166,7 @@ textarea.form-control-lg {
   --bs-btn-padding-x: 0.5rem;
   --bs-btn-font-size: 0.875rem;
   --bs-btn-border-radius: 0.25rem;
+  margin-bottom: 15px;
 }
 
 .fade {
@@ -11241,4 +11242,15 @@ body {
   width: 20px !important;
   font-size: 0.75rem;
   border-radius: 0.375rem !important;
+}
+.card h3 {
+  margin-top: 15px;
+  font-size: 1.5em;
+  text-align: center;
+}
+
+.card p {
+  font-size: 1em;
+  color: #555;
+  text-align: center;
 }

@@ -141,7 +141,7 @@ session_start();
                             <img src="img/moo.jpg" alt="หมูกะทะ">
                             <h3>เมนูเด็ดประจำร้าน</h3>
                             <p>หลากหลายเมนูที่เราเลือกสรรมาเพื่อคุณ</p>
-                            <a href="manage_menu.php" class="btn">ดูเมนู</a>
+                            <a href="manage_menu.php" class="btn btn-primary btn-sm">ดูเมนู</a>
                         </div>
                     </div>
                 </div>
