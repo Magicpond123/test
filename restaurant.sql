@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 04, 2024 at 09:49 AM
+-- Generation Time: Jul 05, 2024 at 09:13 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,8 +29,17 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `category` (
   `category_id` int(11) NOT NULL,
-  `type` int(1) DEFAULT NULL COMMENT '1=food\r\n2=beverage\r\n3=dessert'
+  `type` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `category`
+--
+
+INSERT INTO `category` (`category_id`, `type`) VALUES
+(1, 'food'),
+(2, 'beverage'),
+(3, 'dessert');
 
 -- --------------------------------------------------------
 
@@ -40,12 +49,21 @@ CREATE TABLE `category` (
 
 CREATE TABLE `employees` (
   `emp_id` int(11) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `firstname` varchar(100) NOT NULL,
-  `lastname` int(100) NOT NULL,
+  `lastname` varchar(100) NOT NULL,
   `mail` varchar(100) NOT NULL,
-  `location` varchar(100) NOT NULL,
+  `location` text NOT NULL,
   `role` int(1) NOT NULL COMMENT '1=Owner\r\n2=Cashier\r\n3=Receptionist\r\n4=Kitchen'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `employees`
+--
+
+INSERT INTO `employees` (`emp_id`, `username`, `password`, `firstname`, `lastname`, `mail`, `location`, `role`) VALUES
+(1, 'mgp01', '123', 'samdosaodkosa', 'sadsadsa', 'sadsadsad', 'sadasd', 1);
 
 -- --------------------------------------------------------
 
@@ -58,10 +76,18 @@ CREATE TABLE `menuitems` (
   `category_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `description` text NOT NULL,
-  `price` decimal(10,2) DEFAULT NULL,
-  `status` int(1) DEFAULT NULL COMMENT '1=available\r\n2=unavailable',
+  `price` decimal(10,2) NOT NULL,
+  `image_path` varchar(255) NOT NULL,
+  `status` int(1) NOT NULL COMMENT '1=available\r\n2=unavailable',
   `unit_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `menuitems`
+--
+
+INSERT INTO `menuitems` (`item_id`, `category_id`, `name`, `description`, `price`, `image_path`, `status`, `unit_id`) VALUES
+(0, 1, 'moo mixed', 'sadasd', 123.00, 'uploads/moo.jpg', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -73,7 +99,7 @@ CREATE TABLE `orderdetails` (
   `order_details_id` int(11) NOT NULL,
   `order_id` int(11) NOT NULL,
   `item_id` int(11) NOT NULL,
-  `quantity` int(11) NOT NULL,
+  `quantity` int(1) NOT NULL COMMENT '1=กิโลกรัม\r\n2=กรัม\r\n3=ชิ้น\r\n4=แพ็ค',
   `status` int(1) NOT NULL COMMENT '1=available\r\n2=outoff'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -87,7 +113,7 @@ CREATE TABLE `orders` (
   `order_id` int(11) NOT NULL,
   `table_id` int(11) NOT NULL,
   `emp_id` int(11) NOT NULL,
-  `order_date` datetime DEFAULT NULL,
+  `order_date` datetime NOT NULL,
   `order_status` int(1) NOT NULL COMMENT '1=paid\r\n2=not paid'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -100,9 +126,9 @@ CREATE TABLE `orders` (
 CREATE TABLE `payments` (
   `payment_id` int(11) NOT NULL,
   `order_id` int(11) NOT NULL,
-  `payment_time` datetime DEFAULT NULL,
-  `total_amount` decimal(10,2) DEFAULT NULL,
-  `payment_status` int(11) DEFAULT NULL COMMENT '1=Paid\r\n2=pending\r\n3=cancelled',
+  `payment_time` datetime NOT NULL,
+  `total_amount` decimal(10,2) NOT NULL,
+  `payment_status` int(11) NOT NULL COMMENT '1=Paid\r\n2=pending\r\n3=cancelled',
   `promotion_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -114,11 +140,11 @@ CREATE TABLE `payments` (
 
 CREATE TABLE `promotions` (
   `promotion_id` int(11) NOT NULL,
-  `name` varchar(100) DEFAULT NULL,
+  `name` varchar(100) NOT NULL,
   `description` text NOT NULL,
-  `start_date` date DEFAULT NULL,
-  `end_date` date DEFAULT NULL,
-  `discount` decimal(5,2) DEFAULT NULL
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `discount` decimal(5,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -129,8 +155,8 @@ CREATE TABLE `promotions` (
 
 CREATE TABLE `tables` (
   `table_id` int(11) NOT NULL,
-  `table_number` int(11) DEFAULT NULL,
-  `table_status` int(1) DEFAULT NULL COMMENT '1=available\r\n2=unavailable'
+  `table_number` int(11) NOT NULL,
+  `table_status` int(1) NOT NULL COMMENT '1=available\r\n2=unavailable'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -141,8 +167,18 @@ CREATE TABLE `tables` (
 
 CREATE TABLE `unit` (
   `unit_id` int(11) NOT NULL,
-  `name` int(1) NOT NULL COMMENT '1=กิโลกรัม\r\n2=กรัม\r\n3=ชิ้น\r\n4=แพ็ค\r\n'
+  `name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `unit`
+--
+
+INSERT INTO `unit` (`unit_id`, `name`) VALUES
+(1, 'กิโลกรัม'),
+(2, 'กรัม'),
+(3, 'ชิ้น'),
+(4, 'แพ็ค');
 
 --
 -- Indexes for dumped tables
@@ -218,7 +254,7 @@ ALTER TABLE `unit`
 -- AUTO_INCREMENT for table `employees`
 --
 ALTER TABLE `employees`
-  MODIFY `emp_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `emp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
