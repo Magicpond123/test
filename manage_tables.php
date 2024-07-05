@@ -6,43 +6,15 @@ if (!isset($_SESSION['username'])) {
 }
 include 'includes/db_connect.php';
 
-$item_id = $_GET['id'];
-$sql = "SELECT * FROM menuitems WHERE item_id = $item_id";
+// Fetch table data
+$sql = "SELECT table_id, table_number, table_status FROM tables";
 $result = $conn->query($sql);
-$menu_item = $result->fetch_assoc();
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $description = $_POST['description'];
-    $price = $_POST['price'];
-    $category_id = $_POST['category_id'];
-    $image_path = $menu_item['image_path'];
-
-    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-        $target_dir = "uploads/";
-        $image_path = $target_dir . basename($_FILES["image"]["name"]);
-        move_uploaded_file($_FILES["image"]["tmp_name"], $image_path);
-    }
-
-    $sql = "UPDATE menuitems SET 
-            name = '$name', 
-            description = '$description', 
-            price = '$price', 
-            category_id = '$category_id', 
-            image_path = '$image_path' 
-            WHERE item_id = $item_id";
-    if ($conn->query($sql) === TRUE) {
-        header("Location: manage_menu.php");
-    } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Menu Item</title>
+    <title>Manage Tables</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -69,16 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-user fa-fw"></i>
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         Guest
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <?php if (isset($_SESSION['username'])): ?>
-                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
-                    <?php else: ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
+                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                    <?php else : ?>
                         <li><a class="dropdown-item" href="login.php">Login</a></li>
                     <?php endif; ?>
                 </ul>
@@ -124,9 +96,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         Guest
                     <?php endif; ?>
                 </div>
@@ -135,48 +107,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Edit Menu Item</h1>
+                    <h1 class="mt-4">Manage Tables</h1>
                     <ol class="breadcrumb mb-4">
-                    <li class="breadcrumb-item"><a href="manage_tables.php">Manage Menu Item</a></li>
-                    <li class="breadcrumb-item active">Edit Menu Item</li>
+                        <li class="breadcrumb-item active">Manage Tables</li>
                     </ol>
                     <div class="card mb-4">
                         <div class="card-header">
-                            <i class="fas fa-edit me-1"></i>
-                            Edit Menu Item
+                            <i class="fas fa-table me-1"></i>
+                            Table Data
                         </div>
                         <div class="card-body">
-                            <form action="edit_menu_item.php?id=<?php echo $item_id; ?>" method="post" enctype="multipart/form-data">
-                                <div class="form-group mb-3">
-                                    <label for="name">Name:</label>
-                                    <input type="text" class="form-control" id="name" name="name" value="<?php echo $menu_item['name']; ?>" required>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="description">Description:</label>
-                                    <textarea class="form-control" id="description" name="description" required><?php echo $menu_item['description']; ?></textarea>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="price">Price:</label>
-                                    <input type="number" step="0.01" class="form-control" id="price" name="price" value="<?php echo $menu_item['price']; ?>" required>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="category_id">Category:</label><br>
-                                    <input type="radio" id="food" name="category_id" value="1" <?php echo ($menu_item['category_id'] == 1) ? 'checked' : ''; ?> required>
-                                    <label for="food">Food</label><br>
-                                    <input type="radio" id="beverage" name="category_id" value="2" <?php echo ($menu_item['category_id'] == 2) ? 'checked' : ''; ?> required>
-                                    <label for="beverage">Beverage</label><br>
-                                    <input type="radio" id="dessert" name="category_id" value="3" <?php echo ($menu_item['category_id'] == 3) ? 'checked' : ''; ?> required>
-                                    <label for="dessert">Dessert</label>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="image">Image:</label>
-                                    <input type="file" class="form-control" id="image" name="image">
-                                    <?php if ($menu_item['image_path']) { ?>
-                                        <img src="<?php echo $menu_item['image_path']; ?>" alt="Menu Item Image" style="width: 100px; height: auto;">
+                            <a href="add_table.php" class="btn btn-primary mb-3">Add New Table</a>
+                            <table id="datatablesSimple" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Table Number</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $i=1;
+                                    while ($row = $result->fetch_assoc()) { ?>
+                                    <tr>
+                                        <td><?php echo $i++; ?></td>
+                                        <td><?php echo $row['table_number']; ?></td>
+                                        <td><?php echo $row['table_status'] == 1 ? 'Available' : 'Unavailable'; ?></td>
+                                        <td>
+                                            <a href="edit_table.php?id=<?php echo $row['table_id']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['table_id']; ?>">Delete</button>
+                                        </td>
+                                    </tr>
                                     <?php } ?>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Update Menu Item</button>
-                            </form>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -199,3 +165,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="js/scripts.js"></script>
 </body>
 </html>
+<script>
+document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const unitId = this.getAttribute('data-id');
+        Swal.fire({
+            title: "คุณต้องการลบหรือไม่?",
+            text: "",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `delete_table.php?id=${unitId}`;
+            }
+        });
+    });
+});
+</script>

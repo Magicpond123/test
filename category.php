@@ -88,6 +88,14 @@ if (!$result) {
                             <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
                             จัดการหน่วย
                         </a>
+                        <a class="nav-link" href="manage_tables.php">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            จัดการโต๊ะ
+                        </a>
+                        <a class="nav-link" href="manage_orders.php">
+                            <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
+                            จัดการออเดอร์
+                        </a>
                     </div>
                 </div>
                 <div class="sb-sidenav-footer">
@@ -160,7 +168,7 @@ if (!$result) {
 <script>
 document.querySelectorAll('.delete-btn').forEach(button => {
     button.addEventListener('click', function() {
-        const unitId = this.getAttribute('data-id');
+        const category_id = this.getAttribute('data-id');
         Swal.fire({
             title: "คุณต้องการลบหรือไม่?",
             text: "",
@@ -171,7 +179,7 @@ document.querySelectorAll('.delete-btn').forEach(button => {
             confirmButtonText: "Yes"
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = `delete_category.php?id=${unitId}`;
+                window.location.href = `delete_category.php?id=${category_id}`;
             }
         });
     });

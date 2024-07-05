@@ -102,6 +102,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
                             จัดการหน่วย
                         </a>
+                        <a class="nav-link" href="manage_tables.php">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            จัดการโต๊ะ
+                        </a>
+                        <a class="nav-link" href="manage_orders.php">
+                            <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
+                            จัดการออเดอร์
+                        </a>
                     </div>
                 </div>
                 <div class="sb-sidenav-footer">
@@ -119,7 +127,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="container-fluid px-4">
                     <h1 class="mt-4">Edit Unit</h1>
                     <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item"><a href="manage_tables.php">Manage Unit</a></li>
                         <li class="breadcrumb-item active">Edit Unit</li>
+                    </ol>
                     </ol>
                     <div class="card mb-4">
                         <div class="card-header">
