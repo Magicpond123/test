@@ -6,17 +6,20 @@ if (!isset($_SESSION['username'])) {
 }
 include 'includes/db_connect.php';
 
-// Fetch menu items data
-$sql = "SELECT menuitems.item_id, menuitems.name, menuitems.description, menuitems.price, menuitems.image_path, category.type AS category 
-        FROM menuitems 
-        JOIN category ON menuitems.category_id = category.category_id";
+// Fetch categories data
+$sql = "SELECT category_id, type FROM category";
 $result = $conn->query($sql);
+
+// ตรวจสอบการเรียกใช้คำสั่ง SQL
+if (!$result) {
+    die("Error executing query: " . $conn->error);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Menu</title>
+    <title>Manage Categories</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -65,7 +68,7 @@ $result = $conn->query($sql);
                             จัดการพนักงาน
                         </a>
                         <a class="nav-link" href="category.php">
-                            <div class="sb-nav-link-icon"><i class="fas fas fa-list"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
                             จัดการหมวดหมู่
                         </a>
                         <a class="nav-link" href="unit.php">
@@ -87,49 +90,33 @@ $result = $conn->query($sql);
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Manage Menu</h1>
+                    <h1 class="mt-4">Manage Categories</h1>
                     <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item active">Manage Menu</li>
+                        <li class="breadcrumb-item active">Manage Categories</li>
                     </ol>
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            Menu Data
+                            Category Data
                         </div>
                         <div class="card-body">
-                            <a href="add_menu_item.php" class="btn btn-primary mb-3">Add New Menu Item</a>
+                            <a href="add_category.php" class="btn btn-primary mb-3">Add New Category</a>
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Description</th>
-                                        <th>Price</th>
-                                        <th>Category</th>
-                                        <th>Image</th>
+                                        <th>Type</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php
-                                    $i=1;
-                                    while ($row = $result->fetch_assoc()) { ?>
+                                    <?php while ($row = $result->fetch_assoc()) { ?>
                                     <tr>
-                                        <td><?php echo $i; ?></td>
-                                        <td><?php echo $row['name']; ?></td>
-                                        <td><?php echo $row['description']; ?></td>
-                                        <td><?php echo $row['price']; ?></td>
-                                        <td><?php echo $row['category']; ?></td>
+                                        <td><?php echo $row['category_id']; ?></td>
+                                        <td><?php echo $row['type']; ?></td>
                                         <td>
-                                            <?php
-                                            $i++;
-                                            if ($row['image_path']) { ?>
-                                                <img src="<?php echo $row['image_path']; ?>" alt="Menu Item Image" style="width: 100px; height: auto;">
-                                            <?php } ?>
-                                        </td>
-                                        <td>
-                                            <a href="edit_menu_item.php?id=<?php echo $row['item_id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                            <a href="delete_menu_item.php?id=<?php echo $row['item_id']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                                            <a href="edit_category.php?id=<?php echo $row['category_id']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                                            <a href="delete_category.php?id=<?php echo $row['category_id']; ?>" class="btn btn-danger btn-sm">Delete</a>
                                         </td>
                                     </tr>
                                     <?php } ?>

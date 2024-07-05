@@ -17,6 +17,7 @@ $result = $conn->query($sql);
     <title>Manage Employees</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -60,6 +61,14 @@ $result = $conn->query($sql);
                         <a class="nav-link" href="manage_employees.php">
                         <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             จัดการพนักงาน
+                        </a>
+                        <a class="nav-link" href="category.php">
+                            <div class="sb-nav-link-icon"><i class="fas fas fa-list"></i></div>
+                            จัดการหมวดหมู่
+                        </a>
+                        <a class="nav-link" href="unit.php">
+                        <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
+                            จัดการหน่วย
                         </a>
                     </div>
                 </div>

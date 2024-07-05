@@ -63,6 +63,14 @@ session_start();
                             <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             จัดการพนักงาน
                         </a>
+                        <a class="nav-link" href="category.php">
+                            <div class="sb-nav-link-icon"><i class="fas fas fa-list"></i></div>
+                            จัดการหมวดหมู่
+                        </a>
+                        <a class="nav-link" href="unit.php">
+                        <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
+                            จัดการหน่วย
+                        </a>
                     </div>
                 </div>
                 <div class="sb-sidenav-footer">
