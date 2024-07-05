@@ -6,11 +6,19 @@ if (!isset($_SESSION['username'])) {
 }
 include 'includes/db_connect.php';
 
+// Fetch categories and units data
+$category_sql = "SELECT category_id, type FROM category";
+$category_result = $conn->query($category_sql);
+
+$unit_sql = "SELECT unit_id, name FROM unit";
+$unit_result = $conn->query($unit_sql);
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $description = $_POST['description'];
     $price = $_POST['price'];
     $category_id = $_POST['category_id'];
+    $unit_id = $_POST['unit_id'];
     $image_path = '';
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
@@ -19,8 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         move_uploaded_file($_FILES["image"]["tmp_name"], $image_path);
     }
 
-    $sql = "INSERT INTO menuitems (name, description, price, category_id, image_path) 
-            VALUES ('$name', '$description', '$price', '$category_id', '$image_path')";
+    $sql = "INSERT INTO menuitems (name, description, price, category_id, unit_id, image_path) 
+            VALUES ('$name', '$description', '$price', '$category_id', '$unit_id', '$image_path')";
     if ($conn->query($sql) === TRUE) {
         header("Location: manage_menu.php");
     } else {
@@ -36,17 +44,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script>
+        function checker(){
+            var result =confirm('คุณต้องการออกจากระบบหรือไม่?');
+            if(result == false){
+                event.preventDefault();
+            }
+        }
+    </script>
+    <script>
+        function checker(){
+            var result =confirm('คุณต้องการออกจากระบบหรือไม่?');
+            if(result == false){
+                event.preventDefault();
+            }
+        }
+    </script>
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="index.php">ต้วงหมูกะทะ</a>
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
-        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-            <div class="input-group">
-                <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
-                <button class="btn btn-danger" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
-            </div>
-        </form>
         <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -59,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])): ?>
-                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
                     <?php else: ?>
                         <li><a class="dropdown-item" href="login.php">Login</a></li>
                     <?php endif; ?>
@@ -87,11 +105,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             จัดการพนักงาน
                         </a>
                         <a class="nav-link" href="category.php">
-                            <div class="sb-nav-link-icon"><i class="fas fas fa-list"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
                             จัดการหมวดหมู่
                         </a>
                         <a class="nav-link" href="unit.php">
-                            <div class="sb-nav-link-icon"><i class="fa-balance-scale"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
                             จัดการหน่วย
                         </a>
                     </div>
@@ -133,13 +151,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <input type="number" step="0.01" class="form-control" id="price" name="price" required>
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label for="category_id">Category:</label><br>
-                                    <input type="radio" id="food" name="category_id" value="1" required>
-                                    <label for="food">Food</label><br>
-                                    <input type="radio" id="beverage" name="category_id" value="2" required>
-                                    <label for="beverage">Beverage</label><br>
-                                    <input type="radio" id="dessert" name="category_id" value="3" required>
-                                    <label for="dessert">Dessert</label>
+                                    <label for="category_id">Category:</label>
+                                    <select class="form-control" id="category_id" name="category_id" required>
+                                        <?php while ($row = $category_result->fetch_assoc()) { ?>
+                                            <option value="<?php echo $row['category_id']; ?>"><?php echo $row['type']; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="unit_id">Unit:</label>
+                                    <select class="form-control" id="unit_id" name="unit_id" required>
+                                        <?php while ($row = $unit_result->fetch_assoc()) { ?>
+                                            <option value="<?php echo $row['unit_id']; ?>"><?php echo $row['name']; ?></option>
+                                        <?php } ?>
+                                    </select>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="image">Image:</label>

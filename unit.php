@@ -6,7 +6,7 @@ if (!isset($_SESSION['username'])) {
 }
 include 'includes/db_connect.php';
 
-// Fetch units data
+
 $sql = "SELECT unit_id, name FROM unit";
 $result = $conn->query($sql);
 ?>
@@ -18,6 +18,15 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function checker(){
+            var result =confirm('คุณต้องการออกจากระบบหรือไม่?');
+            if(result == false){
+                event.preventDefault();
+            }
+        }
+    </script>
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -41,7 +50,7 @@ $result = $conn->query($sql);
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])): ?>
-                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
                     <?php else: ?>
                         <li><a class="dropdown-item" href="login.php">Login</a></li>
                     <?php endif; ?>
@@ -117,7 +126,7 @@ $result = $conn->query($sql);
                                         <td><?php echo $row['name']; ?></td>
                                         <td>
                                             <a href="edit_unit.php?id=<?php echo $row['unit_id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                            <a href="delete_unit.php?id=<?php echo $row['unit_id']; ?>" class="btn btn-danger btn-sm">Delete</a>
+                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['unit_id']; ?>">Delete</button>
                                         </td>
                                     </tr>
                                     <?php } ?>
@@ -143,5 +152,27 @@ $result = $conn->query($sql);
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
+    
 </body>
 </html>
+<script>
+document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const unitId = this.getAttribute('data-id');
+        Swal.fire({
+            title: "คุณต้องการลบหรือไม่?",
+            text: "",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `delete_unit.php?id=${unitId}`;
+            }
+        });
+    });
+});
+</script>
+

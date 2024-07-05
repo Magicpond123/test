@@ -42,6 +42,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script>
+        function checker(){
+            var result =confirm('คุณต้องการออกจากระบบหรือไม่?');
+            if(result == false){
+                event.preventDefault();
+            }
+        }
+    </script>
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -65,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])): ?>
-                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
                     <?php else: ?>
                         <li><a class="dropdown-item" href="login.php">Login</a></li>
                     <?php endif; ?>

@@ -3,6 +3,7 @@ session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -13,7 +14,16 @@ session_start();
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script>
+        function checker(){
+            var result =confirm('คุณต้องการออกจากระบบหรือไม่?');
+            if(result == false){
+                event.preventDefault();
+            }
+        }
+    </script>
 </head>
+
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="index.php">ต้วงหมูกะทะ</a>
@@ -28,16 +38,16 @@ session_start();
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-user fa-fw"></i>
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         Guest
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <?php if (isset($_SESSION['username'])): ?>
-                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                    <?php else: ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
+                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
+                    <?php else : ?>
                         <li><a class="dropdown-item" href="login.php">Login</a></li>
                     <?php endif; ?>
                 </ul>
@@ -68,16 +78,16 @@ session_start();
                             จัดการหมวดหมู่
                         </a>
                         <a class="nav-link" href="unit.php">
-                        <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
                             จัดการหน่วย
                         </a>
                     </div>
                 </div>
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         Guest
                     <?php endif; ?>
                 </div>
@@ -127,6 +137,12 @@ session_start();
                                 </div>
                             </div>
                         </div>
+                        <div class="card mb-4 card-img">
+                            <img src="img/moo.jpg" alt="หมูกะทะ">
+                            <h3>เมนูเด็ดประจำร้าน</h3>
+                            <p>หลากหลายเมนูที่เราเลือกสรรมาเพื่อคุณ</p>
+                            <a href="manage_menu.php" class="btn">ดูเมนู</a>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -147,4 +163,5 @@ session_start();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
 </body>
+
 </html>
