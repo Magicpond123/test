@@ -107,27 +107,27 @@ if (!$result) {
                     <ol class="breadcrumb mb-4">
                         <li class="breadcrumb-item active">จัดการพนักงาน</li>
                     </ol>
-                    <div class="mb-4">
-                        <a href="register.php" class="btn btn-primary">สมัครพนักงานใหม่</a>
-                    </div>
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
                             ข้อมูลพนักงาน
                         </div>
                         <div class="card-body">
+                        <div class="mb-4">
+                        <a href="register.php" class="btn btn-primary">สมัครพนักงานใหม่</a>
+                    </div>
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>ลำดับ</th>
-                                        <th>ชื่อผู้ใช้</th>
-                                        <th>ชื่อจริง</th>
-                                        <th>นามสกุล</th>
-                                        <th>อีเมล</th>
-                                        <th>ที่อยู่</th>
-                                        <th>ตำแหน่ง</th>
-                                        <th>สถานะ</th>
-                                        <th>ปรับแต่ง</th>
+                                        <th style="text-align: center;">ลำดับ</th>
+                                        <th style="text-align: center;">ชื่อผู้ใช้</th>
+                                        <th style="text-align: center;">ชื่อจริง</th>
+                                        <th style="text-align: center;">นามสกุล</th>
+                                        <th style="text-align: center;">อีเมล</th>
+                                        <th style="text-align: center;">ที่อยู่</th>
+                                        <th style="text-align: center;">ตำแหน่ง</th>
+                                        <th style="text-align: center;">สถานะ</th>
+                                        <th style="text-align: center;">ปรับแต่ง</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -135,13 +135,13 @@ if (!$result) {
                                     $i = 1;
                                     while ($row = $result->fetch_assoc()) { ?>
                                     <tr>
-                                        <td><?php echo $i++; ?></td>
-                                        <td><?php echo $row['username']; ?></td>
-                                        <td><?php echo $row['firstname']; ?></td>
-                                        <td><?php echo $row['lastname']; ?></td>
-                                        <td><?php echo $row['mail']; ?></td>
-                                        <td><?php echo $row['location']; ?></td>
-                                        <td>
+                                        <td style="text-align: center;"><?php echo $i++; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['username']; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['firstname']; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['lastname']; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['mail']; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['location']; ?></td>
+                                        <td style="text-align: center;">
                                             <?php 
                                             switch ($row['role']) {
                                                 case 1:
@@ -161,12 +161,12 @@ if (!$result) {
                                             }
                                             ?>
                                         </td>
-                                        <td><?php 
+                                        <td style="text-align: center;"><?php 
                                             if ($row['status'] == 1) echo 'ออนไลน์';
                                             elseif ($row['status'] == 2) echo 'ออฟไลน์';
                                             else echo 'ลาออก'; ?>
                                         </td>
-                                        <td>
+                                        <td style="text-align: center;">
                                             <a href="edit_employee.php?id=<?php echo $row['emp_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
                                             <a href="delete_employee.php?id=<?php echo $row['emp_id']; ?>" class="btn btn-danger btn-sm">ลบ</a>
                                         </td>

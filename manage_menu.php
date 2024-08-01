@@ -126,13 +126,13 @@ $result = $conn->query($sql);
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>ลำดับ</th>
-                                        <th>ชื่อ</th>
-                                        <th>ราคา</th>
-                                        <th>ประเภท</th>
-                                        <th>หน่วย</th>
-                                        <th>ปรับแต่ง</th>
-                                        <th>ดูรายละเอียด</th>
+                                        <th style="text-align: center;">ลำดับ</th>
+                                        <th style="text-align: center;">ชื่อ</th>
+                                        <th style="text-align: center;">ราคา</th>
+                                        <th style="text-align: center;">ประเภท</th>
+                                        <th style="text-align: center;">หน่วย</th>
+                                        <th style="text-align: center;">ปรับแต่ง</th>
+                                        <th style="text-align: center;">ดูรายละเอียด</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -140,12 +140,12 @@ $result = $conn->query($sql);
                                     $i=1;
                                     while ($row = $result->fetch_assoc()) { ?>
                                     <tr>
-                                        <td><?php echo $i++; ?></td>
-                                        <td><?php echo $row['name']; ?></td>
-                                        <td><?php echo number_format($row['price'], 2); ?></td>
-                                        <td><?php echo $row['category']; ?></td>
-                                        <td><?php echo $row['unit']; ?></td>
-                                        <td>
+                                        <td style="text-align: center;"><?php echo $i++; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['name']; ?></td>
+                                        <td style="text-align: right;"><?php echo number_format($row['price'], 2); ?></td>
+                                        <td style="text-align: center;"><?php echo $row['category']; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['unit']; ?></td>
+                                        <td style="text-align: center;">
                                             <a href="edit_menu_item.php?id=<?php echo $row['item_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
                                             <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['item_id']; ?>">ลบ</button>
                                         </td>

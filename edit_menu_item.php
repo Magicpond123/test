@@ -133,54 +133,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </nav>
         </div>
         <div id="layoutSidenav_content">
-            <main>
-                <div class="container-fluid px-4">
-                    <h1 class="mt-4">Edit Menu Item</h1>
-                    <ol class="breadcrumb mb-4">
-                    <li class="breadcrumb-item"><a href="manage_tables.php">Manage Menu Item</a></li>
-                    <li class="breadcrumb-item active">Edit Menu Item</li>
-                    </ol>
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <i class="fas fa-edit me-1"></i>
-                            Edit Menu Item
-                        </div>
-                        <div class="card-body">
-                            <form action="edit_menu_item.php?id=<?php echo $item_id; ?>" method="post" enctype="multipart/form-data">
-                                <div class="form-group mb-3">
-                                    <label for="name">Name:</label>
-                                    <input type="text" class="form-control" id="name" name="name" value="<?php echo $menu_item['name']; ?>" required>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="description">Description:</label>
-                                    <textarea class="form-control" id="description" name="description" required><?php echo $menu_item['description']; ?></textarea>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="price">Price:</label>
-                                    <input type="number" step="0.01" class="form-control" id="price" name="price" value="<?php echo $menu_item['price']; ?>" required>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="category_id">Category:</label><br>
-                                    <input type="radio" id="food" name="category_id" value="1" <?php echo ($menu_item['category_id'] == 1) ? 'checked' : ''; ?> required>
-                                    <label for="food">Food</label><br>
-                                    <input type="radio" id="beverage" name="category_id" value="2" <?php echo ($menu_item['category_id'] == 2) ? 'checked' : ''; ?> required>
-                                    <label for="beverage">Beverage</label><br>
-                                    <input type="radio" id="dessert" name="category_id" value="3" <?php echo ($menu_item['category_id'] == 3) ? 'checked' : ''; ?> required>
-                                    <label for="dessert">Dessert</label>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="image">Image:</label>
-                                    <input type="file" class="form-control" id="image" name="image">
-                                    <?php if ($menu_item['image_path']) { ?>
-                                        <img src="<?php echo $menu_item['image_path']; ?>" alt="Menu Item Image" style="width: 100px; height: auto;">
-                                    <?php } ?>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Update Menu Item</button>
-                            </form>
-                        </div>
+        <main>
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">แก้ไขรายการอาหาร</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="manage_tables.php">จัดการรายการอาหาร</a></li>
+            <li class="breadcrumb-item active">แก้ไขรายการอาหาร</li>
+        </ol>
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-edit me-1"></i>
+                แก้ไขรายการอาหาร
+            </div>
+            <div class="card-body">
+                <form action="edit_menu_item.php?id=<?php echo $item_id; ?>" method="post" enctype="multipart/form-data">
+                    <div class="form-group mb-3">
+                        <label for="name">ชื่อ:</label>
+                        <input type="text" class="form-control" id="name" name="name" value="<?php echo $menu_item['name']; ?>" required>
                     </div>
-                </div>
-            </main>
+                    <div class="form-group mb-3">
+                        <label for="description">คำอธิบาย:</label>
+                        <textarea class="form-control" id="description" name="description" required><?php echo $menu_item['description']; ?></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="price">ราคา:</label>
+                        <input type="number" step="0.01" class="form-control" id="price" name="price" value="<?php echo $menu_item['price']; ?>" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="category_id">หมวดหมู่:</label>
+                        <select class="form-control" id="category_id" name="category_id" required>
+                            <option value="1" <?php echo ($menu_item['category_id'] == 1) ? 'selected' : ''; ?>>อาหาร</option>
+                            <option value="2" <?php echo ($menu_item['category_id'] == 2) ? 'selected' : ''; ?>>เครื่องดื่ม</option>
+                            <option value="3" <?php echo ($menu_item['category_id'] == 3) ? 'selected' : ''; ?>>ของหวาน</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="status">สถานะ:</label>
+                        <select class="form-control" id="status" name="status" required>
+                            <option value="1" <?php echo ($menu_item['status'] == 1) ? 'selected' : ''; ?>>มีให้บริการ</option>
+                            <option value="2" <?php echo ($menu_item['status'] == 2) ? 'selected' : ''; ?>>ไม่มีให้บริการ</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="image">รูปภาพ:</label>
+                        <input type="file" class="form-control" id="image" name="image">
+                        <?php if ($menu_item['image_path']) { ?>
+                            <img src="<?php echo $menu_item['image_path']; ?>" alt="รูปภาพรายการอาหาร" style="width: 100px; height: auto;">
+                        <?php } ?>
+                    </div>
+                    <button type="submit" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">

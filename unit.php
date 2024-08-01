@@ -122,17 +122,17 @@ $result = $conn->query($sql);
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>ลำดับ</th>
-                                        <th>ชื่อหน่วย</th>
-                                        <th>ปรับแต่ง</th>
+                                        <th style="text-align: center;">ลำดับ</th>
+                                        <th style="text-align: center;">ชื่อหน่วย</th>
+                                        <th style="text-align: center;">ปรับแต่ง</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php while ($row = $result->fetch_assoc()) { ?>
                                     <tr>
-                                        <td><?php echo $row['unit_id']; ?></td>
-                                        <td><?php echo $row['name']; ?></td>
-                                        <td>
+                                        <td style="text-align: center;"><?php echo $row['unit_id']; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['name']; ?></td>
+                                        <td style="text-align: center;">
                                             <a href="edit_unit.php?id=<?php echo $row['unit_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
                                             <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['unit_id']; ?>">ลบ</button>
                                         </td>

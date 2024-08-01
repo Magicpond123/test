@@ -119,15 +119,18 @@ $result = $conn->query($sql);
                             ข้อมูลออเดอร์
                         </div>
                         <div class="card-body">
+                        <div class="mb-4">
+                        <a href="menu_order.php" class="btn btn-primary">สั่งออเดอร์</a>
+                    </div>
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>เลขออเดอร์</th>
-                                        <th>เลขโต๊ะ</th>
-                                        <th>ชื่อพนักงาน</th>
-                                        <th>วันที่</th>
-                                        <th>สถานะ</th>
-                                        <th>ปรับแต่ง</th>
+                                        <th style="text-align: center;">เลขออเดอร์</th>
+                                        <th style="text-align: center;">เลขโต๊ะ</th>
+                                        <th style="text-align: center;">ชื่อพนักงาน</th>
+                                        <th style="text-align: center;">วันที่</th>
+                                        <th style="text-align: center;">สถานะ</th>
+                                        <th style="text-align: center;">ปรับแต่ง</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -135,12 +138,12 @@ $result = $conn->query($sql);
                                     $i=1;
                                      while ($row = $result->fetch_assoc()) { ?>
                                     <tr>
-                                        <td><?php echo $i++; ?></td>
-                                        <td><?php echo $row['table_id']; ?></td>
-                                        <td><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
-                                        <td><?php echo $row['order_date']; ?></td>
-                                        <td><?php echo $row['order_status'] == 1 ? 'จ่ายแล้ว' : 'ยังไม่ได้ชำระ'; ?></td>
-                                        <td>
+                                        <td style="text-align: center;"><?php echo $i++; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['table_id']; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['order_date']; ?></td>
+                                        <td style="text-align: center;"><?php echo $row['order_status'] == 1 ? 'จ่ายแล้ว' : 'ยังไม่ได้ชำระ'; ?></td>
+                                        <td style="text-align: center;">
                                             <a href="edit_order.php?id=<?php echo $row['order_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
                                             <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['order_id']; ?>">ลบ</button>
                                         </td>
