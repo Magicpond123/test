@@ -27,8 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         move_uploaded_file($_FILES["image"]["tmp_name"], $image_path);
     }
 
-    $sql = "INSERT INTO menuitems (name, description, price, category_id, unit_id, image_path) 
-            VALUES ('$name', '$description', '$price', '$category_id', '$unit_id', '$image_path')";
+    $sql = "INSERT INTO menuitems (name, description, price, category_id, unit_id, status, image_path) 
+            VALUES ('$name', '$description', '$price', '$category_id', '$unit_id', '$status', '$image_path')";
     if ($conn->query($sql) === TRUE) {
         header("Location: manage_menu.php");
     } else {
@@ -177,6 +177,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <div class="form-group mb-3">
                                     <label for="image">รูปภาพ:</label>
                                     <input type="file" class="form-control" id="image" name="image">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="status">สถานะ:</label>
+                                    <select class="form-control" id="status" name="status" required>
+                                        <option value="1">พร้อมใช้งาน</option>
+                                        <option value="2">ไม่พร้อมใช้งาน</option>
+                                          </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary">เพิ่มรายการอาหาร</button>
                             </form>

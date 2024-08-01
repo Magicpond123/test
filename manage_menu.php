@@ -128,12 +128,11 @@ $result = $conn->query($sql);
                                     <tr>
                                         <th>ลำดับ</th>
                                         <th>ชื่อ</th>
-                                        <th>รายละเอียด</th>
                                         <th>ราคา</th>
                                         <th>ประเภท</th>
                                         <th>หน่วย</th>
-                                        <th>รูปภาพ</th>
                                         <th>ปรับแต่ง</th>
+                                        <th>ดูรายละเอียด</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -143,15 +142,9 @@ $result = $conn->query($sql);
                                     <tr>
                                         <td><?php echo $i++; ?></td>
                                         <td><?php echo $row['name']; ?></td>
-                                        <td><?php echo $row['description']; ?></td>
                                         <td><?php echo number_format($row['price'], 2); ?></td>
                                         <td><?php echo $row['category']; ?></td>
                                         <td><?php echo $row['unit']; ?></td>
-                                        <td>
-                                            <?php if ($row['image_path']) { ?>
-                                                <img src="<?php echo $row['image_path']; ?>" alt="Menu Item Image" style="width: 100px; height: auto;">
-                                            <?php } ?>
-                                        </td>
                                         <td>
                                             <a href="edit_menu_item.php?id=<?php echo $row['item_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
                                             <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['item_id']; ?>">ลบ</button>

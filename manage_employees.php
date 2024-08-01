@@ -9,6 +9,10 @@ include 'includes/db_connect.php';
 // Fetch employees data
 $sql = "SELECT emp_id, username, firstname, lastname, mail, location, role, status FROM employees";
 $result = $conn->query($sql);
+
+if (!$result) {
+    die("Query Failed: " . $conn->error);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
