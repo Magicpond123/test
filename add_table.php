@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $sql = "INSERT INTO tables (table_number, table_status) VALUES ('$table_number', '$table_status')";
     if ($conn->query($sql) === TRUE) {
-        header("Location: table.php");
+        header("Location: manage_tables.php");
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add Table</title>
+    <title>เพิ่มโต๊ะ</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
                     <?php else : ?>
-                        Guest
+                        ผู้เยี่ยมชม
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">

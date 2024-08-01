@@ -41,14 +41,14 @@ session_start();
                     <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
                     <?php else : ?>
-                        Guest
+                        ผู้เยี่ยมชม
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])) : ?>
-                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
+                        <li><a onclick=checker() class="dropdown-item" href="logout.php">ออกจากระบบ</a></li>
                     <?php else : ?>
-                        <li><a class="dropdown-item" href="login.php">Login</a></li>
+                        <li><a class="dropdown-item" href="login.php">เข้าสู่ระบบ</a></li>
                     <?php endif; ?>
                 </ul>
             </li>
@@ -96,7 +96,7 @@ session_start();
                     <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
                     <?php else : ?>
-                        Guest
+                        ผู้เยี่ยมชม
                     <?php endif; ?>
                 </div>
             </nav>

@@ -45,14 +45,14 @@ $result = $conn->query($sql);
                     <?php if (isset($_SESSION['username'])): ?>
                         <?php echo $_SESSION['username']; ?>
                     <?php else: ?>
-                        Guest
+                        ผู้เยี่ยมชม
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])): ?>
-                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
+                        <li><a onclick=checker() class="dropdown-item" href="logout.php">ออกจากระบบ</a></li>
                     <?php else: ?>
-                        <li><a class="dropdown-item" href="login.php">Login</a></li>
+                        <li><a class="dropdown-item" href="login.php">เข้าสู่ระบบ</a></li>
                     <?php endif; ?>
                 </ul>
             </li>
@@ -108,23 +108,23 @@ $result = $conn->query($sql);
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Manage Units</h1>
+                    <h1 class="mt-4">จัดการหน่วย</h1>
                     <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item active">Manage Units</li>
+                        <li class="breadcrumb-item active">จัดการหน่วย</li>
                     </ol>
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            Unit Data
+                            ข้อมูลหน่วย
                         </div>
                         <div class="card-body">
-                            <a href="add_unit.php" class="btn btn-primary mb-3">Add New Unit</a>
+                            <a href="add_unit.php" class="btn btn-primary mb-3">เพิ่มหน่วยใหม่</a>
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Actions</th>
+                                        <th>ลำดับ</th>
+                                        <th>ชื่อหน่วย</th>
+                                        <th>ปรับแต่ง</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -133,8 +133,8 @@ $result = $conn->query($sql);
                                         <td><?php echo $row['unit_id']; ?></td>
                                         <td><?php echo $row['name']; ?></td>
                                         <td>
-                                            <a href="edit_unit.php?id=<?php echo $row['unit_id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['unit_id']; ?>">Delete</button>
+                                            <a href="edit_unit.php?id=<?php echo $row['unit_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
+                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['unit_id']; ?>">ลบ</button>
                                         </td>
                                     </tr>
                                     <?php } ?>

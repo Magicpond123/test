@@ -10,7 +10,7 @@ $table_id = $_GET['id'];
 
 $sql = "DELETE FROM tables WHERE table_id='$table_id'";
 if ($conn->query($sql) === TRUE) {
-    header("Location: table.php");
+    header("Location: manage_tables.php");
 } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
 }

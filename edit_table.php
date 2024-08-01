@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Table</title>
+    <title>แก้ไขโต๊ะ</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -58,14 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
                     <?php else : ?>
-                        Guest
+                        ผู้เยี่ยมชม
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])) : ?>
-                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
+                        <li><a onclick=checker() class="dropdown-item" href="logout.php">ออกจากระบบ</a></li>
                     <?php else : ?>
-                        <li><a class="dropdown-item" href="login.php">Login</a></li>
+                        <li><a class="dropdown-item" href="login.php">เข้าสู่ระบบ</a></li>
                     <?php endif; ?>
                 </ul>
             </li>
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
                     <?php else : ?>
-                        Guest
+                        ผู้เยี่ยมชม
                     <?php endif; ?>
                 </div>
             </nav>
@@ -121,31 +121,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Edit Table</h1>
+                    <h1 class="mt-4">แก้ไขโต๊ะ</h1>
                     <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item"><a href="manage_tables.php">Manage Tables</a></li>
-                        <li class="breadcrumb-item active">Edit Table</li>
+                        <li class="breadcrumb-item"><a href="manage_tables.php">จัดการโต๊ะ</a></li>
+                        <li class="breadcrumb-item active">แก้ไขโต๊ะ</li>
                     </ol>
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-edit me-1"></i>
-                            Edit Table
+                            แก้ไขโต๊ะ
                         </div>
                         <div class="card-body">
                             <form action="edit_table.php" method="post">
                                 <input type="hidden" name="table_id" value="<?php echo $row['table_id']; ?>">
                                 <div class="form-group mb-3">
-                                    <label for="table_number">Table Number:</label>
+                                    <label for="table_number">เลขโต๊ะ:</label>
                                     <input type="text" class="form-control" id="table_number" name="table_number" value="<?php echo $row['table_number']; ?>" required>
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label for="table_status">Table Status:</label>
+                                    <label for="table_status">สถานะ:</label>
                                     <select class="form-control" id="table_status" name="table_status" required>
-                                        <option value="1" <?php if ($row['table_status'] == 1) echo 'selected'; ?>>Available</option>
-                                        <option value="2" <?php if ($row['table_status'] == 2) echo 'selected'; ?>>Unavailable</option>
+                                        <option value="1" <?php if ($row['table_status'] == 1) echo 'selected'; ?>>ว่าง</option>
+                                        <option value="2" <?php if ($row['table_status'] == 2) echo 'selected'; ?>>ไม่ว่าง</option>
                                     </select>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Update Table</button>
+                                <button type="submit" class="btn btn-primary">อัพเดทโต๊ะ</button>
                             </form>
                         </div>
                     </div>

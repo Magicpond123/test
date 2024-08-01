@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add Menu Item</title>
+    <title>เพิ่มรายการเมนูอาหาร</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -77,9 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])): ?>
-                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
+                        <li><a onclick=checker() class="dropdown-item" href="logout.php">ออกจากระบบ</a></li>
                     <?php else: ?>
-                        <li><a class="dropdown-item" href="login.php">Login</a></li>
+                        <li><a class="dropdown-item" href="login.php">เข้าสู่ระบบ</a></li>
                     <?php endif; ?>
                 </ul>
             </li>
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <?php if (isset($_SESSION['username'])): ?>
                         <?php echo $_SESSION['username']; ?>
                     <?php else: ?>
-                        Guest
+                        ผู้เยี่ยมชม
                     <?php endif; ?>
                 </div>
             </nav>
@@ -135,31 +135,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Add Menu Item</h1>
+                    <h1 class="mt-4">เพิ่มรายการอาหาร</h1>
                     <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item active">Add Menu Item</li>
+                        <li class="breadcrumb-item active">เพิ่มรายการอาหาร</li>
                     </ol>
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-plus-circle me-1"></i>
-                            Add New Menu Item
+                            เพิ่มรายการอาหาร
                         </div>
                         <div class="card-body">
                             <form action="add_menu_item.php" method="post" enctype="multipart/form-data">
                                 <div class="form-group mb-3">
-                                    <label for="name">Name:</label>
+                                    <label for="name">ชื่อ:</label>
                                     <input type="text" class="form-control" id="name" name="name" required>
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label for="description">Description:</label>
+                                    <label for="description">รายละเอียด:</label>
                                     <textarea class="form-control" id="description" name="description" required></textarea>
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label for="price">Price:</label>
+                                    <label for="price">ราคา:</label>
                                     <input type="number" step="0.01" class="form-control" id="price" name="price" required>
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label for="category_id">Category:</label>
+                                    <label for="category_id">ประเภท:</label>
                                     <select class="form-control" id="category_id" name="category_id" required>
                                         <?php while ($row = $category_result->fetch_assoc()) { ?>
                                             <option value="<?php echo $row['category_id']; ?>"><?php echo $row['type']; ?></option>
@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     </select>
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label for="unit_id">Unit:</label>
+                                    <label for="unit_id">หน่วย:</label>
                                     <select class="form-control" id="unit_id" name="unit_id" required>
                                         <?php while ($row = $unit_result->fetch_assoc()) { ?>
                                             <option value="<?php echo $row['unit_id']; ?>"><?php echo $row['name']; ?></option>
@@ -175,10 +175,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     </select>
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label for="image">Image:</label>
+                                    <label for="image">รูปภาพ:</label>
                                     <input type="file" class="form-control" id="image" name="image">
                                 </div>
-                                <button type="submit" class="btn btn-primary">Add Menu Item</button>
+                                <button type="submit" class="btn btn-primary">เพิ่มรายการอาหาร</button>
                             </form>
                         </div>
                     </div>

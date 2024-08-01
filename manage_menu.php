@@ -49,14 +49,14 @@ $result = $conn->query($sql);
                     <?php if (isset($_SESSION['username'])): ?>
                         <?php echo $_SESSION['username']; ?>
                     <?php else: ?>
-                        Guest
+                        ผู้เยี่ยมชม
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])): ?>
-                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                        <li><a class="dropdown-item" href="logout.php">ออกจากระบบ</a></li>
                     <?php else: ?>
-                        <li><a class="dropdown-item" href="login.php">Login</a></li>
+                        <li><a class="dropdown-item" href="login.php">เข้าสู่ระบบ</a></li>
                     <?php endif; ?>
                 </ul>
             </li>
@@ -112,28 +112,28 @@ $result = $conn->query($sql);
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Manage Menu</h1>
+                    <h1 class="mt-4">จัดการรายการอาหาร</h1>
                     <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item active">Manage Menu</li>
+                        <li class="breadcrumb-item active">จัดการรายการอาหาร</li>
                     </ol>
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            Menu Items Data
+                            เพิ่มรายการอาหาร
                         </div>
                         <div class="card-body">
-                            <a href="add_menu_item.php" class="btn btn-primary mb-3">Add New Menu Item</a>
+                            <a href="add_menu_item.php" class="btn btn-primary mb-3">เพิ่มรายการอาหาร</a>
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Description</th>
-                                        <th>Price</th>
-                                        <th>Category</th>
-                                        <th>Unit</th>
-                                        <th>Image</th>
-                                        <th>Actions</th>
+                                        <th>ลำดับ</th>
+                                        <th>ชื่อ</th>
+                                        <th>รายละเอียด</th>
+                                        <th>ราคา</th>
+                                        <th>ประเภท</th>
+                                        <th>หน่วย</th>
+                                        <th>รูปภาพ</th>
+                                        <th>ปรับแต่ง</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -144,7 +144,7 @@ $result = $conn->query($sql);
                                         <td><?php echo $i++; ?></td>
                                         <td><?php echo $row['name']; ?></td>
                                         <td><?php echo $row['description']; ?></td>
-                                        <td><?php echo $row['price']; ?></td>
+                                        <td><?php echo number_format($row['price'], 2); ?></td>
                                         <td><?php echo $row['category']; ?></td>
                                         <td><?php echo $row['unit']; ?></td>
                                         <td>
@@ -153,8 +153,8 @@ $result = $conn->query($sql);
                                             <?php } ?>
                                         </td>
                                         <td>
-                                            <a href="edit_menu_item.php?id=<?php echo $row['item_id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['item_id']; ?>">Delete</button>
+                                            <a href="edit_menu_item.php?id=<?php echo $row['item_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
+                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['item_id']; ?>">ลบ</button>
                                         </td>
                                     </tr>
                                     <?php } ?>

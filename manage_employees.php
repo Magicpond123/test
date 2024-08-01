@@ -7,26 +7,17 @@ if (!isset($_SESSION['username'])) {
 include 'includes/db_connect.php';
 
 // Fetch employees data
-$sql = "SELECT emp_id, username, firstname, lastname, mail, location, role FROM employees";
+$sql = "SELECT emp_id, username, firstname, lastname, mail, location, role, status FROM employees";
 $result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Employees</title>
+    <title>จัดการพนักงาน</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function checker(){
-            var result =confirm('คุณต้องการออกจากระบบหรือไม่?');
-            if(result == false){
-                event.preventDefault();
-            }
-        }
-    </script>
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -45,14 +36,14 @@ $result = $conn->query($sql);
                     <?php if (isset($_SESSION['username'])): ?>
                         <?php echo $_SESSION['username']; ?>
                     <?php else: ?>
-                        Guest
+                        ผู้เยี่ยมชม
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])): ?>
-                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
+                        <li><a class="dropdown-item" href="logout.php">ออกจากระบบ</a></li>
                     <?php else: ?>
-                        <li><a class="dropdown-item" href="login.php">Login</a></li>
+                        <li><a class="dropdown-item" href="login.php">เข้าสู่ระบบ</a></li>
                     <?php endif; ?>
                 </ul>
             </li>
@@ -74,7 +65,7 @@ $result = $conn->query($sql);
                             จัดการรายการอาหาร
                         </a>
                         <a class="nav-link" href="manage_employees.php">
-                        <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                             จัดการพนักงาน
                         </a>
                         <a class="nav-link" href="category.php">
@@ -82,10 +73,10 @@ $result = $conn->query($sql);
                             จัดการหมวดหมู่
                         </a>
                         <a class="nav-link" href="unit.php">
-                        <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
+                            <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
                             จัดการหน่วย
                         </a>
-                        <a class="nav-link" href="manage_tables.php">
+                        <a class="nav-link" href="table.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                             จัดการโต๊ะ
                         </a>
@@ -108,44 +99,72 @@ $result = $conn->query($sql);
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Manage Employees</h1>
+                    <h1 class="mt-4">จัดการพนักงาน</h1>
                     <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item active">Manage Employees</li>
+                        <li class="breadcrumb-item active">จัดการพนักงาน</li>
                     </ol>
+                    <div class="mb-4">
+                        <a href="register.php" class="btn btn-primary">สมัครพนักงานใหม่</a>
+                    </div>
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            Employee Data
+                            ข้อมูลพนักงาน
                         </div>
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Username</th>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Email</th>
-                                        <th>Location</th>
-                                        <th>Role</th>
-                                        <th>Actions</th>
+                                        <th>ลำดับ</th>
+                                        <th>ชื่อผู้ใช้</th>
+                                        <th>ชื่อจริง</th>
+                                        <th>นามสกุล</th>
+                                        <th>อีเมล</th>
+                                        <th>ที่อยู่</th>
+                                        <th>ตำแหน่ง</th>
+                                        <th>สถานะ</th>
+                                        <th>ปรับแต่ง</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $i = 1; 
+                                    $i = 1;
                                     while ($row = $result->fetch_assoc()) { ?>
                                     <tr>
-                                        <td><?php  echo $i++; ?></td>
+                                        <td><?php echo $i++; ?></td>
                                         <td><?php echo $row['username']; ?></td>
                                         <td><?php echo $row['firstname']; ?></td>
                                         <td><?php echo $row['lastname']; ?></td>
                                         <td><?php echo $row['mail']; ?></td>
                                         <td><?php echo $row['location']; ?></td>
-                                        <td><?php echo $row['role']; ?></td>
                                         <td>
-                                            <a href="edit_employee.php?id=<?php echo $row['emp_id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['emp_id']; ?>">Delete</button>
+                                            <?php 
+                                            switch ($row['role']) {
+                                                case 1:
+                                                    echo 'เจ้าของ';
+                                                    break;
+                                                case 2:
+                                                    echo 'แคชเชียร์';
+                                                    break;
+                                                case 3:
+                                                    echo 'พนักงานต้อนรับ';
+                                                    break;
+                                                case 4:
+                                                    echo 'พนักงานครัว';
+                                                    break;
+                                                default:
+                                                    echo 'ไม่ทราบ';
+                                            }
+                                            ?>
+                                        </td>
+                                        <td><?php 
+                                            if ($row['status'] == 1) echo 'ออนไลน์';
+                                            elseif ($row['status'] == 2) echo 'ออฟไลน์';
+                                            else echo 'ลาออก'; ?>
+                                        </td>
+                                        <td>
+                                            <a href="edit_employee.php?id=<?php echo $row['emp_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
+                                            <a href="delete_employee.php?id=<?php echo $row['emp_id']; ?>" class="btn btn-danger btn-sm">ลบ</a>
                                         </td>
                                     </tr>
                                     <?php } ?>
@@ -171,26 +190,5 @@ $result = $conn->query($sql);
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
-    <script src="js/datatables-simple-demo.js"></script>
 </body>
 </html>
-<script>
-document.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const emp_id = this.getAttribute('data-id');
-        Swal.fire({
-            title: "คุณต้องการลบหรือไม่?",
-            text: "",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = `delete_employee.php?id=${emp_id}`;
-            }
-        });
-    });
-});
-</script>

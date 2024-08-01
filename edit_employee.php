@@ -6,32 +6,27 @@ if (!isset($_SESSION['username'])) {
 }
 include 'includes/db_connect.php';
 
-$emp_id = $_GET['id'];
-$sql = "SELECT * FROM employees WHERE emp_id = $emp_id";
-$result = $conn->query($sql);
-$employee = $result->fetch_assoc();
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $emp_id = $_POST['emp_id'];
     $username = $_POST['username'];
     $firstname = $_POST['firstname'];
     $lastname = $_POST['lastname'];
-    $mail = $_POST['mail'];
+    $email = $_POST['email'];
     $location = $_POST['location'];
     $role = $_POST['role'];
+    $status = $_POST['status'];
 
-    $sql = "UPDATE employees SET 
-            username = '$username', 
-            firstname = '$firstname', 
-            lastname = '$lastname', 
-            mail = '$mail', 
-            location = '$location', 
-            role = '$role' 
-            WHERE emp_id = $emp_id";
+    $sql = "UPDATE employees SET username='$username', firstname='$firstname', lastname='$lastname', mail='$email', location='$location', role='$role', status='$status' WHERE emp_id='$emp_id'";
     if ($conn->query($sql) === TRUE) {
         header("Location: manage_employees.php");
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
+} else {
+    $emp_id = $_GET['id'];
+    $sql = "SELECT * FROM employees WHERE emp_id='$emp_id'";
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
 }
 ?>
 <!DOCTYPE html>
@@ -41,15 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Edit Employee</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <script>
-        function checker(){
-            var result =confirm('คุณต้องการออกจากระบบหรือไม่?');
-            if(result == false){
-                event.preventDefault();
-            }
-        }
-    </script>
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -65,16 +51,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-user fa-fw"></i>
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         Guest
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <?php if (isset($_SESSION['username'])): ?>
-                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
-                    <?php else: ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
+                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                    <?php else : ?>
                         <li><a class="dropdown-item" href="login.php">Login</a></li>
                     <?php endif; ?>
                 </ul>
@@ -108,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
                             จัดการหน่วย
                         </a>
-                        <a class="nav-link" href="manage_tables.php">
+                        <a class="nav-link" href="table.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                             จัดการโต๊ะ
                         </a>
@@ -120,9 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         Guest
                     <?php endif; ?>
                 </div>
@@ -133,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="container-fluid px-4">
                     <h1 class="mt-4">Edit Employee</h1>
                     <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item"><a href="manage_tables.php">Manage Employee</a></li>
+                        <li class="breadcrumb-item"><a href="manage_employees.php">Manage Employees</a></li>
                         <li class="breadcrumb-item active">Edit Employee</li>
                     </ol>
                     <div class="card mb-4">
@@ -142,30 +128,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             Edit Employee
                         </div>
                         <div class="card-body">
-                            <form action="edit_employee.php?id=<?php echo $emp_id; ?>" method="post">
+                            <form action="edit_employee.php" method="post">
+                                <input type="hidden" name="emp_id" value="<?php echo $row['emp_id']; ?>">
                                 <div class="form-group mb-3">
                                     <label for="username">Username:</label>
-                                    <input type="text" class="form-control" id="username" name="username" value="<?php echo $employee['username']; ?>" required>
+                                    <input type="text" class="form-control" id="username" name="username" value="<?php echo $row['username']; ?>" required>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="firstname">First Name:</label>
-                                    <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo $employee['firstname']; ?>" required>
+                                    <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo $row['firstname']; ?>" required>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="lastname">Last Name:</label>
-                                    <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo $employee['lastname']; ?>" required>
+                                    <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo $row['lastname']; ?>" required>
                                 </div>
                                 <div class="form-group mb-3">
-                                    <label for="mail">Email:</label>
-                                    <input type="email" class="form-control" id="mail" name="mail" value="<?php echo $employee['mail']; ?>" required>
+                                    <label for="email">Email:</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="<?php echo $row['mail']; ?>" required>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="location">Location:</label>
-                                    <input type="text" class="form-control" id="location" name="location" value="<?php echo $employee['location']; ?>" required>
+                                    <textarea class="form-control" id="location" name="location" required><?php echo $row['location']; ?></textarea>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="role">Role:</label>
-                                    <input type="text" class="form-control" id="role" name="role" value="<?php echo $employee['role']; ?>" required>
+                                    <select class="form-control" id="role" name="role" required>
+                                        <option value="1" <?php if ($row['role'] == 1) echo 'selected'; ?>>เจ้าของ</option>
+                                        <option value="2" <?php if ($row['role'] == 2) echo 'selected'; ?>>แคชเชียร์</option>
+                                        <option value="3" <?php if ($row['role'] == 3) echo 'selected'; ?>>พนักงานต้อนรับ</option>
+                                        <option value="4" <?php if ($row['role'] == 4) echo 'selected'; ?>>พนักงานครัว</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="status">Status:</label>
+                                    <select class="form-control" id="status" name="status" required>
+                                        <option value="1" <?php if ($row['status'] == 1) echo 'selected'; ?>>ออนไลน์</option>
+                                        <option value="2" <?php if ($row['status'] == 2) echo 'selected'; ?>>ออฟไลน์</option>
+                                        <option value="3" <?php if ($row['status'] == 3) echo 'selected'; ?>>ลาออก</option>
+                                    </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Update Employee</button>
                             </form>

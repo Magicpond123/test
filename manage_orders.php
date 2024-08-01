@@ -46,14 +46,14 @@ $result = $conn->query($sql);
                     <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
                     <?php else : ?>
-                        Guest
+                        ผู้เยี่ยมชม
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])) : ?>
-                        <li><a onclick=checker() class="dropdown-item" href="logout.php">Logout</a></li>
+                        <li><a onclick=checker() class="dropdown-item" href="logout.php">ออกจากระบบ</a></li>
                     <?php else : ?>
-                        <li><a class="dropdown-item" href="login.php">Login</a></li>
+                        <li><a class="dropdown-item" href="login.php">เข้าสู่ระบบ</a></li>
                     <?php endif; ?>
                 </ul>
             </li>
@@ -109,25 +109,25 @@ $result = $conn->query($sql);
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Manage Orders</h1>
+                    <h1 class="mt-4">จัดการออเดอร์</h1>
                     <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item active">Manage Orders</li>
+                        <li class="breadcrumb-item active">จัดการออเดอร์</li>
                     </ol>
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            Orders Data
+                            ข้อมูลออเดอร์
                         </div>
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Order ID</th>
-                                        <th>Table ID</th>
-                                        <th>Employee Name</th>
-                                        <th>Order Date</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
+                                        <th>เลขออเดอร์</th>
+                                        <th>เลขโต๊ะ</th>
+                                        <th>ชื่อพนักงาน</th>
+                                        <th>วันที่</th>
+                                        <th>สถานะ</th>
+                                        <th>ปรับแต่ง</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -139,10 +139,10 @@ $result = $conn->query($sql);
                                         <td><?php echo $row['table_id']; ?></td>
                                         <td><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
                                         <td><?php echo $row['order_date']; ?></td>
-                                        <td><?php echo $row['order_status'] == 1 ? 'Paid' : 'Not Paid'; ?></td>
+                                        <td><?php echo $row['order_status'] == 1 ? 'จ่ายแล้ว' : 'ยังไม่ได้ชำระ'; ?></td>
                                         <td>
-                                            <a href="edit_order.php?id=<?php echo $row['order_id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['order_id']; ?>">Delete</button>
+                                            <a href="edit_order.php?id=<?php echo $row['order_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
+                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['order_id']; ?>">ลบ</button>
                                         </td>
                                     </tr>
                                     <?php } ?>

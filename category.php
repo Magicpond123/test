@@ -17,7 +17,7 @@ if (!$result) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Categories</title>
+    <title>จัดการประเภท</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -48,7 +48,7 @@ if (!$result) {
                     <?php if (isset($_SESSION['username'])): ?>
                         <?php echo $_SESSION['username']; ?>
                     <?php else: ?>
-                        Guest
+                        ผู้เยี่ยมชม
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
@@ -111,23 +111,23 @@ if (!$result) {
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Manage Categories</h1>
+                    <h1 class="mt-4">จัดการประเภท</h1>
                     <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item active">Manage Categories</li>
+                        <li class="breadcrumb-item active">จัดการประเภท</li>
                     </ol>
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            Category Data
+                            ข้อมูลประเภท
                         </div>
                         <div class="card-body">
-                            <a href="add_category.php" class="btn btn-primary mb-3">Add New Category</a>
+                            <a href="add_category.php" class="btn btn-primary mb-3">เพิ่มประเภท</a>
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Type</th>
-                                        <th>Actions</th>
+                                        <th>ลำดับ</th>
+                                        <th>ประเภท</th>
+                                        <th>ปรับแต่ง</th>
                                     </tr>
                                 </thead>
                                 <tbody>
