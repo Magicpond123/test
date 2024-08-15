@@ -16,13 +16,23 @@ if (!$result) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>จัดการพนักงาน</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
+
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="index.php">ต้วงหมูกะทะ</a>
@@ -37,22 +47,40 @@ if (!$result) {
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-user fa-fw"></i>
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         ผู้เยี่ยมชม
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <li><a class="dropdown-item" href="logout.php">ออกจากระบบ</a></li>
-                    <?php else: ?>
+                    <?php else : ?>
                         <li><a class="dropdown-item" href="login.php">เข้าสู่ระบบ</a></li>
                     <?php endif; ?>
                 </ul>
             </li>
         </ul>
     </nav>
+    <!-- Employee Details Modal -->
+    <div class="modal fade" id="employeeDetailsModal" tabindex="-1" aria-labelledby="employeeDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="employeeDetailsModalLabel">รายละเอียดพนักงาน</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Employee details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
@@ -92,9 +120,9 @@ if (!$result) {
                 </div>
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         Guest
                     <?php endif; ?>
                 </div>
@@ -113,9 +141,9 @@ if (!$result) {
                             ข้อมูลพนักงาน
                         </div>
                         <div class="card-body">
-                        <div class="mb-4">
-                        <a href="register.php" class="btn btn-primary">สมัครพนักงานใหม่</a>
-                    </div>
+                            <div class="mb-4">
+                                <a href="register.php" class="btn btn-primary">สมัครพนักงานใหม่</a>
+                            </div>
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -133,43 +161,48 @@ if (!$result) {
                                     <?php
                                     $i = 1;
                                     while ($row = $result->fetch_assoc()) { ?>
-                                    <tr>
-                                        <td style="text-align: center;"><?php echo $i++; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['username']; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['firstname']; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['lastname']; ?></td>
-                                        <td style="text-align: center;">
-                                            <?php 
-                                            switch ($row['role']) {
-                                                case 1:
-                                                    echo 'เจ้าของ';
-                                                    break;
-                                                case 2:
-                                                    echo 'แคชเชียร์';
-                                                    break;
-                                                case 3:
-                                                    echo 'พนักงานต้อนรับ';
-                                                    break;
-                                                case 4:
-                                                    echo 'พนักงานครัว';
-                                                    break;
-                                                case 5:
-                                                    echo 'ลาออก';
-                                                default:
-                                                    echo 'ไม่ทราบ';
-                                            }
-                                            ?>
-                                        </td>
-                                        <td style="text-align: center;"><?php 
-                                            if ($row['status'] == 1) echo 'ออนไลน์';
-                                            elseif ($row['status'] == 2) echo 'ออฟไลน์';
-                                            else echo 'ลาออก'; ?>
-                                        </td>
-                                        <td style="text-align: center;">
-                                            <a href="edit_employee.php?id=<?php echo $row['emp_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
-                                            <a href="delete_employee.php?id=<?php echo $row['emp_id']; ?>" class="btn btn-danger btn-sm">ลบ</a>
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td style="text-align: center;"><?php echo $i++; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['username']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['firstname']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['lastname']; ?></td>
+                                            <td style="text-align: center;">
+                                                <?php
+                                                switch ($row['role']) {
+                                                    case 1:
+                                                        echo 'เจ้าของ';
+                                                        break;
+                                                    case 2:
+                                                        echo 'แคชเชียร์';
+                                                        break;
+                                                    case 3:
+                                                        echo 'พนักงานต้อนรับ';
+                                                        break;
+                                                    case 4:
+                                                        echo 'พนักงานครัว';
+                                                        break;
+                                                    case 5:
+                                                        echo 'ลาออก';
+                                                    default:
+                                                        echo 'ไม่ทราบ';
+                                                }
+                                                ?>
+                                            </td>
+                                            <td style="text-align: center;"><?php
+                                                                            if ($row['status'] == 1) echo 'ออนไลน์';
+                                                                            elseif ($row['status'] == 2) echo 'ออฟไลน์';
+                                                                            else echo 'ลาออก'; ?>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <a href="edit_employee.php?id=<?php echo $row['emp_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
+                                                <a href="delete_employee.php?id=<?php echo $row['emp_id']; ?>" class="btn btn-danger btn-sm">ลบ</a>
+                                            </td>
+                                            <td>
+                                                <!-- Button trigger modal -->
+                                                <button type="button" class="btn btn-info btn-sm view-details" data-id="<?php echo $row['emp_id']; ?>">
+                                                    แสดงรายละเอียด
+                                                </button>
+                                        </tr>
                                     <?php } ?>
                                 </tbody>
                             </table>
@@ -193,5 +226,22 @@ if (!$result) {
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
+    <script>
+        document.querySelectorAll('.view-details').forEach(button => {
+            button.addEventListener('click', function() {
+                const empId = this.getAttribute('data-id');
+                fetch('fetch_employee_details.php?id=' + empId)
+                    .then(response => response.text())
+                    .then(data => {
+                        document.querySelector('#employeeDetailsModal .modal-body').innerHTML = data;
+                        new bootstrap.Modal(document.getElementById('employeeDetailsModal')).show();
+                    });
+            });
+        });
+    </script>
+
+
+
 </body>
+
 </html>
