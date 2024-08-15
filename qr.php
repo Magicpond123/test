@@ -1,8 +1,8 @@
 <?php
 include 'phpqrcode/qrlib.php';
 
-$table_id = 2;
-$url = "http://localhost/test/menu_order.php?table_id=" . $table_id;
+$table_id = 3;
+$url = "http://localhost/test/menu_order.php?table_id=3" . $table_id;
 $filename = "qrcodes/table_$table_id.png";
 
 // สร้างโฟลเดอร์ qrcodes ถ้าไม่มี

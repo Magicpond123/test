@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $category_id = $_POST['category_id'];
     $unit_id = $_POST['unit_id'];
     $image_path = '';
+    $status = $_POST['status'];
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $target_dir = "uploads/";

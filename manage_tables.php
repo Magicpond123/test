@@ -137,7 +137,7 @@ $result = $conn->query($sql);
                                         <td style="text-align: center;"><?php echo $row['table_status'] == 1 ? 'พร้อมใช้งาน' : 'ไม่พร้อมใช้งาน'; ?></td>
                                         <td style="text-align: center;">
                                             <a href="edit_table.php?id=<?php echo $row['table_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
-                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['table_id']; ?>">ลบ</button>
+                                            <a href="delete_table.php?id=<?php echo $row['table_id']; ?>" class="btn btn-warning btn-sm">ลบ</a>
                                         </td>
                                     </tr>
                                     <?php } ?>

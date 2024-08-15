@@ -16,6 +16,7 @@ $result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Manage Menu</title>
@@ -24,14 +25,40 @@ $result = $conn->query($sql);
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function checker(){
-            var result =confirm('คุณต้องการออกจากระบบหรือไม่?');
-            if(result == false){
+        function checker() {
+            var result = confirm('คุณต้องการออกจากระบบหรือไม่?');
+            if (result == false) {
                 event.preventDefault();
             }
         }
     </script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function showDetails(itemId) {
+            $.ajax({
+                url: "fetch_item_details.php",
+                method: "POST",
+                data: {
+                    id: itemId
+                },
+                success: function(data) {
+                    // เปิด modal และแสดงข้อมูลที่ได้จาก server
+                    $('#itemDetailsModal .modal-body').html(data);
+                    $('#itemDetailsModal').modal('show');
+                }
+            });
+        }
+    </script>
 </head>
+
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="index.php">ต้วงหมูกะทะ</a>
@@ -46,16 +73,16 @@ $result = $conn->query($sql);
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-user fa-fw"></i>
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         ผู้เยี่ยมชม
                     <?php endif; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <li><a class="dropdown-item" href="logout.php">ออกจากระบบ</a></li>
-                    <?php else: ?>
+                    <?php else : ?>
                         <li><a class="dropdown-item" href="login.php">เข้าสู่ระบบ</a></li>
                     <?php endif; ?>
                 </ul>
@@ -101,13 +128,31 @@ $result = $conn->query($sql);
                 </div>
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                    <?php if (isset($_SESSION['username'])): ?>
+                    <?php if (isset($_SESSION['username'])) : ?>
                         <?php echo $_SESSION['username']; ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         Guest
                     <?php endif; ?>
                 </div>
             </nav>
+        </div>
+        <div class="modal fade" id="itemDetailsModal" tabindex="-1" role="dialog" aria-labelledby="itemDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="itemDetailsModalLabel">รายละเอียดรายการอาหาร</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- ข้อมูลรายละเอียดจะถูกเพิ่มที่นี่ -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="layoutSidenav_content">
             <main>
@@ -136,20 +181,24 @@ $result = $conn->query($sql);
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php 
-                                    $i=1;
+                                    <?php
+                                    $i = 1;
                                     while ($row = $result->fetch_assoc()) { ?>
-                                    <tr>
-                                        <td style="text-align: center;"><?php echo $i++; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['name']; ?></td>
-                                        <td style="text-align: right;"><?php echo number_format($row['price'], 2); ?></td>
-                                        <td style="text-align: center;"><?php echo $row['category']; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['unit']; ?></td>
-                                        <td style="text-align: center;">
-                                            <a href="edit_menu_item.php?id=<?php echo $row['item_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
-                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['item_id']; ?>">ลบ</button>
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td style="text-align: center;"><?php echo $i++; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['name']; ?></td>
+                                            <td style="text-align: right;"><?php echo number_format($row['price'], 2); ?></td>
+                                            <td style="text-align: center;"><?php echo $row['category']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['unit']; ?></td>
+                                            <td style="text-align: center;">
+                                                <a href="edit_menu_item.php?id=<?php echo $row['item_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
+                                                <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['item_id']; ?>">ลบ</button>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:void(0);" class="btn btn-info btn-sm" data-id="<?php echo $row['item_id']; ?>" onclick="showDetails(<?php echo $row['item_id']; ?>)">ดูรายละเอียด</a>
+                                            </td>
+
+                                        </tr>
                                     <?php } ?>
                                 </tbody>
                             </table>
@@ -174,24 +223,25 @@ $result = $conn->query($sql);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
 </body>
+
 </html>
 <script>
-document.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const item_id = this.getAttribute('data-id');
-        Swal.fire({
-            title: "คุณต้องการลบหรือไม่?",
-            text: "",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = `delete_menu_item.php?id=${item_id}`;
-            }
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const item_id = this.getAttribute('data-id');
+            Swal.fire({
+                title: "คุณต้องการลบหรือไม่?",
+                text: "",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `delete_menu_item.php?id=${item_id}`;
+                }
+            });
         });
     });
-});
 </script>

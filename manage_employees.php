@@ -80,7 +80,7 @@ if (!$result) {
                             <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
                             จัดการหน่วย
                         </a>
-                        <a class="nav-link" href="table.php">
+                        <a class="nav-link" href="manage_tables.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                             จัดการโต๊ะ
                         </a>
@@ -123,11 +123,10 @@ if (!$result) {
                                         <th style="text-align: center;">ชื่อผู้ใช้</th>
                                         <th style="text-align: center;">ชื่อจริง</th>
                                         <th style="text-align: center;">นามสกุล</th>
-                                        <th style="text-align: center;">อีเมล</th>
-                                        <th style="text-align: center;">ที่อยู่</th>
                                         <th style="text-align: center;">ตำแหน่ง</th>
                                         <th style="text-align: center;">สถานะ</th>
                                         <th style="text-align: center;">ปรับแต่ง</th>
+                                        <th style="text-align: center;">รายละเอียด</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -139,8 +138,6 @@ if (!$result) {
                                         <td style="text-align: center;"><?php echo $row['username']; ?></td>
                                         <td style="text-align: center;"><?php echo $row['firstname']; ?></td>
                                         <td style="text-align: center;"><?php echo $row['lastname']; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['mail']; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['location']; ?></td>
                                         <td style="text-align: center;">
                                             <?php 
                                             switch ($row['role']) {
@@ -156,6 +153,8 @@ if (!$result) {
                                                 case 4:
                                                     echo 'พนักงานครัว';
                                                     break;
+                                                case 5:
+                                                    echo 'ลาออก';
                                                 default:
                                                     echo 'ไม่ทราบ';
                                             }
