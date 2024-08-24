@@ -14,6 +14,7 @@ $result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Manage Orders</title>
@@ -21,14 +22,15 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <script>
-        function checker(){
-            var result =confirm('คุณต้องการออกจากระบบหรือไม่?');
-            if(result == false){
+        function checker() {
+            var result = confirm('คุณต้องการออกจากระบบหรือไม่?');
+            if (result == false) {
                 event.preventDefault();
             }
         }
     </script>
 </head>
+
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="index.php">ต้วงหมูกะทะ</a>
@@ -110,7 +112,7 @@ $result = $conn->query($sql);
             <main>
                 <div class="container-fluid px-4">
                     <h1 class="mt-4">จัดการออเดอร์</h1>
-                    <ol class="breadcrumb mb-4">
+                    <ol class="breadcrumb mb=4">
                         <li class="breadcrumb-item active">จัดการออเดอร์</li>
                     </ol>
                     <div class="card mb-4">
@@ -119,9 +121,9 @@ $result = $conn->query($sql);
                             ข้อมูลออเดอร์
                         </div>
                         <div class="card-body">
-                        <div class="mb-4">
-                        <a href="menu_order.php" class="btn btn-primary">สั่งออเดอร์</a>
-                    </div>
+                            <div class="mb-4">
+                                <a href="menu_order.php" class="btn btn-primary">สั่งออเดอร์</a>
+                            </div>
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -135,19 +137,20 @@ $result = $conn->query($sql);
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $i=1;
-                                     while ($row = $result->fetch_assoc()) { ?>
-                                    <tr>
-                                        <td style="text-align: center;"><?php echo $i++; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['table_id']; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['order_date']; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['order_status'] == 1 ? 'จ่ายแล้ว' : 'ยังไม่ได้ชำระ'; ?></td>
-                                        <td style="text-align: center;">
-                                            <a href="edit_order.php?id=<?php echo $row['order_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
-                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['order_id']; ?>">ลบ</button>
-                                        </td>
-                                    </tr>
+                                    $i = 1;
+                                    while ($row = $result->fetch_assoc()) { ?>
+                                        <tr>
+                                            <td style="text-align: center;"><?php echo $i++; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['table_id']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['order_date']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['order_status'] == 1 ? 'จ่ายแล้ว' : 'ยังไม่ได้ชำระ'; ?></td>
+                                            <td style="text-align: center;">
+                                                <a href="order_details.php?order_id=<?php echo $row['order_id']; ?>" class="btn btn-info btn-sm">ดูรายละเอียด</a>
+                                                <a href="edit_order.php?id=<?php echo $row['order_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
+                                                <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['order_id']; ?>">ลบ</button>
+                                            </td>
+                                        </tr>
                                     <?php } ?>
                                 </tbody>
                             </table>
@@ -171,25 +174,28 @@ $result = $conn->query($sql);
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
-</body>
-</html>
-<script>
-document.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', function() {
-        const order_id = this.getAttribute('data-id');
-        Swal.fire({
-            title: "คุณต้องการลบหรือไม่?",
-            text: "",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = `delete_order.php?id=${order_id}`;
-            }
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const order_id = this.getAttribute('data-id');
+                Swal.fire({
+                    title: "คุณต้องการลบหรือไม่?",
+                    text: "",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "ใช่, ลบเลย!",
+                    cancelButtonText: "ยกเลิก"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = `delete_order.php?id=${order_id}`;
+                    }
+                });
+            });
         });
-    });
-});
-</script>
+    </script>
+</body>
+
+</html>

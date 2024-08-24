@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 25, 2024 at 10:50 AM
+-- Generation Time: Aug 18, 2024 at 09:23 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,8 +18,31 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `restaurant3`
+-- Database: `restaurant`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart_items`
+--
+
+CREATE TABLE `cart_items` (
+  `id` int(11) NOT NULL,
+  `item_name` varchar(255) DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `image` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cart_items`
+--
+
+INSERT INTO `cart_items` (`id`, `item_name`, `price`, `quantity`, `created_at`, `image`) VALUES
+(1, 'กุ้งขาว', 25.00, 1, '2024-07-25 18:02:15', 'uploads/menu-img-01.jpg'),
+(3, 'กุ้งขาว', 25.00, 1, '2024-08-01 09:56:41', 'uploads/menu-img-01.jpg');
 
 -- --------------------------------------------------------
 
@@ -38,7 +61,8 @@ CREATE TABLE `category` (
 
 INSERT INTO `category` (`category_id`, `type`) VALUES
 (1, 'food'),
-(3, 'ของหวาน');
+(2, 'beverage'),
+(3, 'dessert');
 
 -- --------------------------------------------------------
 
@@ -54,17 +78,15 @@ CREATE TABLE `employees` (
   `lastname` varchar(100) NOT NULL,
   `mail` varchar(100) NOT NULL,
   `location` text NOT NULL,
-  `role` int(1) NOT NULL COMMENT '1=Owner\r\n2=Cashier\r\n3=Receptionist\r\n4=Kitchen',
-  `status` int(1) NOT NULL
+  `role` int(1) NOT NULL COMMENT '1=Owner\r\n2=Cashier\r\n3=Receptionist\r\n4=Kitchen'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `employees`
 --
 
-INSERT INTO `employees` (`emp_id`, `username`, `password`, `firstname`, `lastname`, `mail`, `location`, `role`, `status`) VALUES
-(1, 'mgp02', '123', 'samdosaodkosa', 'sadsadsa', 'sadsadsad@gmail.com', 'sadasd', 1, 1),
-(2, 'mgp01', '$2y$10$mCkCCksLTbMc8FvAPs7c1OW.UBFp3lMhMeIKoUSo0K9dSJW8umAFy', 'สัจจกร', 'ศิวธนภูวดล', 'pondza1087@gmail.com', 'กหฟหฟกหฟกฟหกหฟก', 3, 1);
+INSERT INTO `employees` (`emp_id`, `username`, `password`, `firstname`, `lastname`, `mail`, `location`, `role`) VALUES
+(1, 'mgp01', '123', 'samdosaodkosa', 'sadsadsa', 'sadsadsad', 'sadasd', 1);
 
 -- --------------------------------------------------------
 
@@ -88,10 +110,30 @@ CREATE TABLE `menuitems` (
 --
 
 INSERT INTO `menuitems` (`item_id`, `category_id`, `name`, `description`, `price`, `image_path`, `status`, `unit_id`) VALUES
-(1, 1, 'moo mixed', 'sadasd', 123.00, 'uploads/moo.jpg', 0, 1),
-(2, 3, 'SALAD', 'SADSAD', 100.00, 'uploads/132_1.jpg', 0, 4),
-(3, 1, 'sadasd', 'sAa', 1234.00, 'uploads/r1rxry2utuUA6UBR1JR-o.jpg', 0, 1),
-(4, 1, 'saSasAassadsad', 'sadasdsad', 200.00, 'uploads/7851e4fa502fd4e7b36c63357ac5db68.jpg', 0, 2);
+(0, 1, 'moo mixed', 'sadasd', 123.00, 'uploads/moo.jpg', 0, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `menu_items`
+--
+
+CREATE TABLE `menu_items` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `price` int(10) NOT NULL,
+  `image` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `menu_items`
+--
+
+INSERT INTO `menu_items` (`id`, `name`, `price`, `image`) VALUES
+(13, 'กุ้งขาว', 25, 'uploads/menu-img-01.jpg'),
+(14, 'ก๋วยเตี๋ยว', 5, 'uploads/415076687_933262361491025_4513849481482337914_n.jpg'),
+(15, 'asd', 170, 'uploads/menu-img-01.jpg'),
+(16, 'ji', 170, 'uploads/menu-img-01.jpg');
 
 -- --------------------------------------------------------
 
@@ -163,16 +205,6 @@ CREATE TABLE `tables` (
   `table_status` int(1) NOT NULL COMMENT '1=available\r\n2=unavailable'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tables`
---
-
-INSERT INTO `tables` (`table_id`, `table_number`, `table_status`) VALUES
-(1, 1, 1),
-(2, 2, 2),
-(3, 3, 1),
-(4, 4, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -199,6 +231,12 @@ INSERT INTO `unit` (`unit_id`, `name`) VALUES
 --
 
 --
+-- Indexes for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `category`
 --
 ALTER TABLE `category`
@@ -217,6 +255,12 @@ ALTER TABLE `menuitems`
   ADD PRIMARY KEY (`item_id`),
   ADD KEY `category_id` (`category_id`),
   ADD KEY `unit_id` (`unit_id`);
+
+--
+-- Indexes for table `menu_items`
+--
+ALTER TABLE `menu_items`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `orderdetails`
@@ -265,22 +309,22 @@ ALTER TABLE `unit`
 --
 
 --
+-- AUTO_INCREMENT for table `cart_items`
+--
+ALTER TABLE `cart_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `employees`
 --
 ALTER TABLE `employees`
-  MODIFY `emp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `emp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `menuitems`
+-- AUTO_INCREMENT for table `menu_items`
 --
-ALTER TABLE `menuitems`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `tables`
---
-ALTER TABLE `tables`
-  MODIFY `table_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+ALTER TABLE `menu_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- Constraints for dumped tables

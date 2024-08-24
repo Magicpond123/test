@@ -2,33 +2,35 @@
 session_start();
 include 'includes/db_connect.php';
 
+date_default_timezone_set('Asia/Bangkok');
+
 // Initialize cart if not already set
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
 // Add item to cart
-if (isset($_GET['item']) && isset($_GET['price']) && isset($_GET['quantity']) && isset($_GET['image'])) {
-    $item = htmlspecialchars($_GET['item']);
-    $price = htmlspecialchars($_GET['price']);
-    $quantity = (int) $_GET['quantity'];
-    $image = htmlspecialchars($_GET['image']);
+if (isset($_POST['item_id']) && isset($_POST['quantity'])) {
+    $item_id = htmlspecialchars($_POST['item_id']);
+    $quantity = (int)$_POST['quantity'];
 
-    // Check if item is already in the cart
-    if (isset($_SESSION['cart'][$item])) {
-        $_SESSION['cart'][$item]['quantity'] += $quantity;
+    // Check if item already in cart
+    if (isset($_SESSION['cart'][$item_id])) {
+        $_SESSION['cart'][$item_id]['quantity'] += $quantity;
     } else {
-        $_SESSION['cart'][$item] = [
-            'price' => $price,
+        $_SESSION['cart'][$item_id] = [
             'quantity' => $quantity,
-            'image' => $image
+            'price' => htmlspecialchars($_POST['price']),
+            'image' => htmlspecialchars($_POST['image'])
         ];
     }
+    header("Location: cart.php");
+    exit();
 }
 
 // Remove item from cart
-if (isset($_GET['remove'])) {
-    $itemToRemove = htmlspecialchars($_GET['remove']);
+if (isset($_POST['remove'])) {
+    $itemToRemove = htmlspecialchars($_POST['remove']);
     if (isset($_SESSION['cart'][$itemToRemove])) {
         unset($_SESSION['cart'][$itemToRemove]);
     }
@@ -39,53 +41,96 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
     $orderSuccess = true;
     $conn->begin_transaction(); // Start transaction
     try {
-        foreach ($_SESSION['cart'] as $item => $details) {
-            $stmt = $conn->prepare("INSERT INTO cart_items (item_name, price, quantity, image) VALUES (?, ?, ?, ?)");
-            if ($stmt === false) {
-                throw new Exception("Prepare statement failed");
-            }
+        $table_id = 2;
+        $emp_id = 2;
+        $order_date = date('Y-m-d H:i:s');
+        $order_status = 2; // Default to 'not paid'
 
-            $stmt->bind_param("sdis", $item, $details['price'], $details['quantity'], $details['image']);
-            $stmt->execute();
+        // Insert into orders table
+        $stmt = $conn->prepare("INSERT INTO orders (table_id, emp_id, order_date, order_status) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("iisi", $table_id, $emp_id, $order_date, $order_status);
+        if (!$stmt->execute()) {
+            throw new Exception("Order insertion failed: " . $stmt->error);
+        }
+        $order_id = $stmt->insert_id;
+        $stmt->close();
+
+        foreach ($_SESSION['cart'] as $item_id => $details) {
+            $stmt = $conn->prepare("INSERT INTO orderdetails (order_id, item_id, quantity) VALUES (?, ?, ?)");
+            $quantity = $details['quantity'];
+            $stmt->bind_param("iii", $order_id, $item_id, $quantity);
+            if (!$stmt->execute()) {
+                throw new Exception("Order details insertion failed: " . $stmt->error);
+            }
             $stmt->close();
         }
 
         // Clear the cart
         $_SESSION['cart'] = [];
         $conn->commit(); // Commit transaction
+        header("Location: success_page.php");
+        exit();
     } catch (Exception $e) {
-        $orderSuccess = false;
         $conn->rollback(); // Rollback transaction
+        echo "Error: " . $e->getMessage(); // Display the error message
     }
-
-    // Return response
-    echo json_encode(['success' => $orderSuccess]);
-    exit();
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ตะกร้าสินค้า</title>
+    <link rel="stylesheet" href="css/styles1.css">
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f8f8;
-            text-align: center;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
         }
-        .cart-container {
-            margin: 20px auto;
+
+        .page-container {
+            width: 100%;
             max-width: 800px;
+            padding: 20px;
+            background-color: #F5EDED;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            margin-top: 20px;
+        }
+
+        .header-container {
+            text-align: center;
+        }
+
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #388E3C;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-container {
+            margin: 20px 0;
             padding: 20px;
             background-color: #fff;
             border: 2px solid #ddd;
             border-radius: 10px;
         }
+
         .cart-item {
             display: flex;
             justify-content: space-between;
@@ -94,6 +139,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
             border-bottom: 1px solid #ddd;
             padding-bottom: 10px;
         }
+
         .cart-item img {
             width: 100px;
             height: 100px;
@@ -101,13 +147,17 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
             border-radius: 5px;
             margin-right: 20px;
         }
+
         .cart-item div {
             text-align: left;
         }
+
         .cart-item p {
             margin: 5px 0;
         }
-        .checkout-btn, .remove-btn {
+
+        .checkout-btn,
+        .remove-btn {
             background-color: #4CAF50;
             color: white;
             padding: 10px 20px;
@@ -117,38 +167,66 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
             text-decoration: none;
             font-size: 18px;
         }
+
         .remove-btn {
             background-color: #f44336;
         }
+
         .remove-btn:hover {
             background-color: #e53935;
         }
+
         .checkout-btn:hover {
             background-color: #45a049;
         }
     </style>
 </head>
+
 <body>
-    <h1>ตะกร้าสินค้า</h1>
-    <div class="cart-container">
-        <?php if (empty($_SESSION['cart'])): ?>
-            <p>ไม่มีรายการอาหารในตะกร้า</p>
-        <?php else: ?>
-            <?php foreach ($_SESSION['cart'] as $item => $details): ?>
-                <div class="cart-item">
-                    <img src="<?php echo htmlspecialchars($details['image']); ?>" alt="<?php echo htmlspecialchars($item); ?>">
-                    <div>
-                        <h3><?php echo htmlspecialchars($item); ?></h3>
-                        <p>ราคา: <?php echo htmlspecialchars($details['price']); ?> บาท</p>
-                        <p>จำนวน: <?php echo htmlspecialchars($details['quantity']); ?></p>
+    <div class="page-container">
+        <div class="header-container">
+            <h1>ตะกร้าสินค้า</h1>
+        </div>
+        <div class="cart-container">
+            <?php if (empty($_SESSION['cart'])) : ?>
+                <p>ไม่มีรายการอาหารในตะกร้า</p>
+            <?php else : ?>
+                <?php foreach ($_SESSION['cart'] as $item_id => $details) : ?>
+                    <?php
+                    // Fetch item details from the database
+                    $stmt = $conn->prepare("SELECT name, price, image_path FROM menuitems WHERE item_id = ?");
+                    $stmt->bind_param("i", $item_id);
+                    $stmt->execute();
+                    $stmt->bind_result($name, $price, $image_path);
+                    $stmt->fetch();
+                    $stmt->close();
+
+                    // Use image_path from database if available, otherwise use the session value
+                    $image = $image_path ?: $details['image'];
+                    ?>
+                    <div class="cart-item">
+                        <img src="<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($name); ?>">
+                        <div>
+                            <h3><?php echo htmlspecialchars($name); ?></h3>
+                            <p>ราคา: <?php echo htmlspecialchars($price); ?> บาท</p>
+                            <p>จำนวน: <?php echo htmlspecialchars($details['quantity']); ?></p>
+                        </div>
+                        <div style="text-align: center;">
+                            <form action="cart.php" method="POST">
+                                <input type="hidden" name="remove" value="<?php echo htmlspecialchars($item_id); ?>">
+                                <button type="submit" class="remove-btn">ลบ</button>
+                            </form>
+                        </div>
                     </div>
-                    <a href="cart.php?remove=<?php echo urlencode($item); ?>" class="remove-btn">ลบ</a>
-                </div>
-            <?php endforeach; ?>
-            <button onclick="completeOrder()" class="checkout-btn">สั่งอาหาร</button>
-        <?php endif; ?>
+                <?php endforeach; ?>
+                <form action="cart.php" method="POST">
+                    <input type="hidden" name="action" value="complete_order">
+                    <button type="submit" class="checkout-btn" onclick="completeOrder()">สั่งอาหาร</button>
+                </form>
+            <?php endif; ?>
+        </div>
+        <a href="menu_order.php" class="checkout-btn">กลับไปที่เมนูอาหาร</a>
     </div>
-    <a href="index.php" class="checkout-btn">กลับไปที่เมนูอาหาร</a>
 
     <!-- SweetAlert2 Integration -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -165,36 +243,11 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
                 cancelButtonText: 'ยกเลิก'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('cart.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams({
-                            action: 'complete_order'
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire(
-                                'สำเร็จ!',
-                                'สั่งรายการอาหารเรียบร้อยแล้ว',
-                                'success'
-                            ).then(() => {
-                                window.location.href = 'menu_order.php'; // เปลี่ยนไปที่หน้า index.php
-                            });
-                        } else {
-                            Swal.fire(
-                                'ผิดพลาด!',
-                                'เกิดข้อผิดพลาดในการสั่งรายการอาหาร',
-                                'error'
-                            );
-                        }
-                    });
+                    document.querySelector('form[action="cart.php"]').submit();
                 }
             });
         }
     </script>
 </body>
+
 </html>
