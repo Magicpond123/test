@@ -60,7 +60,7 @@ session_start();
     <div class="success-container">
         <h1>การสั่งซื้อสำเร็จ!</h1>
         <p>ขอบคุณสำหรับการสั่งซื้อของคุณ.</p>
-        <a href="menu_order.php">กลับไปที่เมนูอาหาร</a>
+        <a href="menu_order_buffet.php">กลับไปที่เมนูอาหาร</a>
     </div>
 </body>
 </html>

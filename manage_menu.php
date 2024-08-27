@@ -7,7 +7,7 @@ if (!isset($_SESSION['username'])) {
 include 'includes/db_connect.php';
 
 // Fetch menu items data
-$sql = "SELECT menuitems.item_id, menuitems.name, menuitems.description, menuitems.price, menuitems.image_path, 
+$sql = "SELECT menuitems.item_id, menuitems.name, menuitems.description, menuitems.price, menuitems.image_path, menuitems.order_type , 
                category.type AS category, unit.name AS unit 
         FROM menuitems 
         JOIN category ON menuitems.category_id = category.category_id 
@@ -176,6 +176,7 @@ $result = $conn->query($sql);
                                         <th style="text-align: center;">ราคา</th>
                                         <th style="text-align: center;">ประเภท</th>
                                         <th style="text-align: center;">หน่วย</th>
+                                        <th style="text-align: center;">ชนิด</th>
                                         <th style="text-align: center;">ปรับแต่ง</th>
                                         <th style="text-align: center;">ดูรายละเอียด</th>
                                     </tr>
@@ -186,10 +187,21 @@ $result = $conn->query($sql);
                                     while ($row = $result->fetch_assoc()) { ?>
                                         <tr>
                                             <td style="text-align: center;"><?php echo $i++; ?></td>
-                                            <td style="text-align: center;"><?php echo $row['name']; ?></td>
+                                            <td style="text-align: left;"><?php echo $row['name']; ?></td>
                                             <td style="text-align: right;"><?php echo number_format($row['price'], 2); ?></td>
-                                            <td style="text-align: center;"><?php echo $row['category']; ?></td>
-                                            <td style="text-align: center;"><?php echo $row['unit']; ?></td>
+                                            <td style="text-align: left;"><?php echo $row['category']; ?></td>
+                                            <td style="text-align: left;"><?php echo $row['unit']; ?></td>
+                                            <td style="text-align: left;">
+                                                <?php
+                                                if ($row['order_type'] == 1) {
+                                                    echo "บุฟเฟ่ต์";
+                                                } elseif ($row['order_type'] == 2) {
+                                                    echo "อะลาคาร์ท";
+                                                } else {
+                                                    echo "ไม่ทราบประเภท";
+                                                }
+                                                ?>
+                                            </td>
                                             <td style="text-align: center;">
                                                 <a href="edit_menu_item.php?id=<?php echo $row['item_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
                                                 <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['item_id']; ?>">ลบ</button>

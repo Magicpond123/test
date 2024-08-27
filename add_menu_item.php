@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $unit_id = $_POST['unit_id'];
     $image_path = '';
     $status = $_POST['status'];
+    $order_type = $_POST['order_type'];
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $target_dir = "uploads/";
@@ -28,8 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         move_uploaded_file($_FILES["image"]["tmp_name"], $image_path);
     }
 
-    $sql = "INSERT INTO menuitems (name, description, price, category_id, unit_id, status, image_path) 
-            VALUES ('$name', '$description', '$price', '$category_id', '$unit_id', '$status', '$image_path')";
+    $sql = "INSERT INTO menuitems (name, description, price, category_id, unit_id, status, image_path, order_type) 
+        VALUES ('$name', '$description', '$price', '$category_id', '$unit_id', '$status', '$image_path', '$order_type')";
+
     if ($conn->query($sql) === TRUE) {
         header("Location: manage_menu.php");
     } else {
@@ -197,8 +199,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <div class="form-group mb-3">
                                     <label for="status">สถานะ:</label>
                                     <select class="form-control" id="status" name="status" required>
-                                        <option value="1">พร้อมใช้งาน</option>
-                                        <option value="2">ไม่พร้อมใช้งาน</option>
+                                        <option value="1">มีให้บริการ</option>
+                                        <option value="2">ไม่มีให้บริการ</option>
+                                        <option value="3">หมด</option>
+                                          </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="order_type">ชนิด:</label>
+                                    <select class="form-control" id="order_type" name="order_type" required>
+                                        <option value="1">บุฟเฟ่ต์</option>
+                                        <option value="2">อะลาคาร์ท</option>
                                           </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary">เพิ่มรายการอาหาร</button>

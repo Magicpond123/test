@@ -6,12 +6,19 @@ if (!isset($_SESSION['username'])) {
 }
 include 'includes/db_connect.php';
 
-// Fetch orders data
-$sql = "SELECT orders.order_id, orders.table_id, employees.firstname, employees.lastname, orders.order_date, orders.order_status 
-        FROM orders 
-        JOIN employees ON orders.emp_id = employees.emp_id";
-$result = $conn->query($sql);
+// ดึงข้อมูลจาก order_buffet (บุฟเฟ่ต์)
+$sql_buffet = "SELECT o.orderbf_id, o.table_id, e.firstname, e.lastname, o.order_date, o.hc, o.ad, o.price_ad, o.price_ch 
+               FROM order_buffet o
+               JOIN employees e ON o.emp_id = e.emp_id";
+$result_buffet = $conn->query($sql_buffet);
+
+// ดึงข้อมูลจาก order_pickup (อะลาคาร์ท)
+$sql_alacarte = "SELECT o.orderpk_id, e.firstname, e.lastname, o.order_date 
+                 FROM order_pickup o
+                 JOIN employees e ON o.emp_id = e.emp_id";
+$result_alacarte = $conn->query($sql_alacarte);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -115,41 +122,70 @@ $result = $conn->query($sql);
                     <ol class="breadcrumb mb=4">
                         <li class="breadcrumb-item active">จัดการออเดอร์</li>
                     </ol>
+                    <div class="mb-4">
+                                <a href="menu_order_buffet.php" class="btn btn-primary">สั่งออเดอร์บุฟเฟ่ต์</a>.
+                                <a href="menu_order_pickup.php" class="btn btn-primary">สั่งออเดอร์กลับบ้าน</a>
+                            </div>
+                            
+                    <!-- ตารางสำหรับข้อมูลบุฟเฟ่ต์ -->
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            ข้อมูลออเดอร์
+                            ข้อมูลออเดอร์ - บุฟเฟ่ต์
                         </div>
                         <div class="card-body">
-                            <div class="mb-4">
-                                <a href="menu_order.php" class="btn btn-primary">สั่งออเดอร์</a>
-                            </div>
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th style="text-align: center;">เลขออเดอร์</th>
-                                        <th style="text-align: center;">เลขโต๊ะ</th>
-                                        <th style="text-align: center;">ชื่อพนักงาน</th>
-                                        <th style="text-align: center;">วันที่</th>
-                                        <th style="text-align: center;">สถานะ</th>
-                                        <th style="text-align: center;">ปรับแต่ง</th>
+                                        <th>เลขออเดอร์</th>
+                                        <th>เลขโต๊ะ</th>
+                                        <th>ชื่อพนักงาน</th>
+                                        <th>วันที่</th>
+                                        <th>จำนวนผู้ใหญ่</th>
+                                        <th>จำนวนเด็ก</th>
+                                        <th>ราคาผู้ใหญ่</th>
+                                        <th>ราคาเด็ก</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php
-                                    $i = 1;
-                                    while ($row = $result->fetch_assoc()) { ?>
+                                    <?php while ($row = $result_buffet->fetch_assoc()) { ?>
                                         <tr>
-                                            <td style="text-align: center;"><?php echo $i++; ?></td>
-                                            <td style="text-align: center;"><?php echo $row['table_id']; ?></td>
-                                            <td style="text-align: center;"><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
-                                            <td style="text-align: center;"><?php echo $row['order_date']; ?></td>
-                                            <td style="text-align: center;"><?php echo $row['order_status'] == 1 ? 'จ่ายแล้ว' : 'ยังไม่ได้ชำระ'; ?></td>
-                                            <td style="text-align: center;">
-                                                <a href="order_details.php?order_id=<?php echo $row['order_id']; ?>" class="btn btn-info btn-sm">ดูรายละเอียด</a>
-                                                <a href="edit_order.php?id=<?php echo $row['order_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
-                                                <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['order_id']; ?>">ลบ</button>
-                                            </td>
+                                            <td><?php echo $row['orderbf_id']; ?></td>
+                                            <td><?php echo $row['table_id']; ?></td>
+                                            <td><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
+                                            <td><?php echo $row['order_date']; ?></td>
+                                            <td><?php echo $row['ad']; ?></td>
+                                            <td><?php echo $row['hc']; ?></td>
+                                            <td><?php echo $row['price_ad']; ?></td>
+                                            <td><?php echo $row['price_ch']; ?></td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ตารางสำหรับข้อมูลอะลาคาร์ท -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <i class="fas fa-table me-1"></i>
+                            ข้อมูลออเดอร์ - กลับบ้าน
+                        </div>
+                        <div class="card-body">
+                            <table id="datatablesSimple" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>เลขออเดอร์</th>
+                                        <th>ชื่อพนักงาน</th>
+                                        <th>วันที่</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while ($row = $result_alacarte->fetch_assoc()) { ?>
+                                        <tr>
+                                            <td><?php echo $row['orderpk_id']; ?></td>
+                                            <td><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
+                                            <td><?php echo $row['order_date']; ?></td>
                                         </tr>
                                     <?php } ?>
                                 </tbody>
@@ -158,6 +194,7 @@ $result = $conn->query($sql);
                     </div>
                 </div>
             </main>
+
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">

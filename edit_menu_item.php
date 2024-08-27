@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $category_id = $_POST['category_id'];
     $image_path = $menu_item['image_path'];
     $status = $_POST['status'];
+    $order_type = $_POST['order_type'];
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $target_dir = "uploads/";
@@ -32,7 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
          price = '$price', 
          category_id = '$category_id', 
          unit_id = '$unit_id',
-         status = '$status' 
+         status = '$status',
+         order_type = '$order_type' 
         WHERE item_id = '$item_id'";
     if ($conn->query($sql) === TRUE) {
         header("Location: manage_menu.php");
@@ -159,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="container-fluid px-4">
                     <h1 class="mt-4">แก้ไขรายการอาหาร</h1>
                     <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item"><a href="manage_tables.php">จัดการรายการอาหาร</a></li>
+                        <li class="breadcrumb-item"><a href="manage_menu.php">จัดการรายการอาหาร</a></li>
                         <li class="breadcrumb-item active">แก้ไขรายการอาหาร</li>
                     </ol>
                     <div class="card mb-4">
@@ -195,7 +197,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         <option value="1" <?php echo ($menu_item['unit_id'] == 1) ? 'selected' : ''; ?>>กิโลกรัม</option>
                                         <option value="2" <?php echo ($menu_item['unit_id'] == 2) ? 'selected' : ''; ?>>กรัม</option>
                                         <option value="3" <?php echo ($menu_item['unit_id'] == 3) ? 'selected' : ''; ?>>ชิ้น</option>
-                                        <option value="3" <?php echo ($menu_item['unit_id'] == 4) ? 'selected' : ''; ?>>แพ็ค</option>
+                                        <option value="4" <?php echo ($menu_item['unit_id'] == 4) ? 'selected' : ''; ?>>แพ็ค</option>
+                                        <option value="5" <?php echo ($menu_item['unit_id'] == 5) ? 'selected' : ''; ?>>ขวด</option>
+                                        <option value="6" <?php echo ($menu_item['unit_id'] == 6) ? 'selected' : ''; ?>>จาน</option>
+                                        <option value="7" <?php echo ($menu_item['unit_id'] == 7) ? 'selected' : ''; ?>>ขีด</option>
                                     </select>
                                 </div>
                                 <div class="form-group mb-3">
@@ -203,6 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <select class="form-control" id="status" name="status" required>
                                         <option value="1" <?php echo ($menu_item['status'] == 1) ? 'selected' : ''; ?>>มีให้บริการ</option>
                                         <option value="2" <?php echo ($menu_item['status'] == 2) ? 'selected' : ''; ?>>ไม่มีให้บริการ</option>
+                                        <option value="2" <?php echo ($menu_item['status'] == 3) ? 'selected' : ''; ?>>หมด</option>
                                     </select>
                                 </div>
                                 <div class="form-group mb-3">
@@ -211,6 +217,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <?php if ($menu_item['image_path']) { ?>
                                         <img src="<?php echo $menu_item['image_path']; ?>" alt="รูปภาพรายการอาหาร" style="width: 100px; height: auto;">
                                     <?php } ?>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="order_type">ชนิด:</label>
+                                    <select class="form-control" id="order_type" name="order_type" required>
+                                        <option value="1" <?php echo ($menu_item['order_type'] == 1) ? 'selected' : ''; ?>>บุฟเฟ่ต์</option>
+                                        <option value="2" <?php echo ($menu_item['order_type'] == 2) ? 'selected' : ''; ?>>อาหารพร้อมสั่ง</option>
+                                    </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>
                             </form>
