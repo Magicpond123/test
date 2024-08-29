@@ -6,7 +6,6 @@ if (isset($_POST['add_to_cart'])) {
     $item_id = $_POST['item_id'];
     $quantity = (int) $_POST['quantity'];
 
-    // ตัวอย่างการจัดการตะกร้าสินค้า
     if (!isset($_SESSION['cart_buffet'])) {
         $_SESSION['cart_buffet'] = [];
     }
@@ -17,47 +16,46 @@ if (isset($_POST['add_to_cart'])) {
         $_SESSION['cart_buffet'][$item_id] = ['quantity' => $quantity];
     }
 
-    // นับจำนวนสินค้าทั้งหมดในตะกร้า
+    // Calculate total items in the cart
     $cart_count = array_sum(array_column($_SESSION['cart_buffet'], 'quantity'));
 
-    // ส่งข้อมูลกลับไปยังหน้าเว็บ
+    // Send back the updated cart count
     echo json_encode(['cart_count' => $cart_count]);
     exit;
 }
 
-// ดึงข้อมูลเมนูสำหรับบุฟเฟ่ต์
-$sql_buffet = "SELECT * FROM menuitems WHERE order_type = 1"; // 1 = บุฟเฟ่ต์
+$sql_buffet = "SELECT * FROM menuitems WHERE order_type = 1";
 $result_buffet = $conn->query($sql_buffet);
 
 if ($result_buffet === false) {
     die("Error: " . $conn->error);
 }
 
-// ดึงข้อมูลอาหาร
 $sql_food = "SELECT * FROM menuitems WHERE category_id = 1 AND order_type = 1";
 $result_food = $conn->query($sql_food);
 
-if ($result_food === false) {
-    die("Error: " . $conn->error);
-}
-
-// ดึงข้อมูลเครื่องดื่ม
 $sql_drink = "SELECT * FROM menuitems WHERE category_id = 2 AND order_type = 1";
 $result_drink = $conn->query($sql_drink);
 
-if ($result_drink === false) {
-    die("Error: " . $conn->error);
-}
-
-// ดึงข้อมูลของหวาน
 $sql_dessert = "SELECT * FROM menuitems WHERE category_id = 3 AND order_type = 1";
 $result_dessert = $conn->query($sql_dessert);
 
-if ($result_dessert === false) {
-    die("Error: " . $conn->error);
-}
+if (isset($_POST['update_customer_count'])) {
+    $_SESSION['adults'] = (int) $_POST['adults'];
+    $_SESSION['children'] = (int) $_POST['children'];
 
+    $price_adults = $_SESSION['adults'] * 149;
+    $price_children = $_SESSION['children'] * 99;
+
+    $_SESSION['price_adults'] = $price_adults;
+    $_SESSION['price_children'] = $price_children;
+
+    header("Location: menu_order_buffet.php");
+    exit;
+}
 ?>
+
+
 <!DOCTYPE html>
 <html lang="th">
 
@@ -67,6 +65,13 @@ if ($result_dessert === false) {
     <title>เมนูบุฟเฟ่ต์</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        #btn{
+            padding: 10px;
+        }
+        #pd {
+            padding: 10px;
+        }
+
         body {
             background-color: #fff5f5;
             color: #4b4b4b;
@@ -252,7 +257,7 @@ if ($result_dessert === false) {
             var quantity = $('#quantity-' + itemId).val();
             $.ajax({
                 type: 'POST',
-                url: 'cart_buffet.php', // ไฟล์ PHP ที่จัดการกับการเพิ่มสินค้าในตะกร้า
+                url: 'menu_order_buffet.php', // คุณควรจะชี้ไปที่ไฟล์ที่จัดการการเพิ่มสินค้าในตะกร้า
                 data: {
                     item_id: itemId,
                     quantity: quantity,
@@ -262,7 +267,7 @@ if ($result_dessert === false) {
                     response = JSON.parse(response);
 
                     if (response.cart_count !== undefined) {
-                        updateCartIcon(response.cart_count); // อัปเดตจำนวนสินค้าในตะกร้าแบบเรียลไทม์
+                        updateCartIcon(response.cart_count);
                         alert('เพิ่มสินค้าลงตะกร้าเรียบร้อยแล้ว!');
                     } else {
                         alert('เกิดข้อผิดพลาดในการอัพเดตไอคอนตะกร้าสินค้า');
@@ -271,26 +276,25 @@ if ($result_dessert === false) {
                 error: function() {
                     alert('เกิดข้อผิดพลาดในการเพิ่มสินค้าลงตะกร้า');
                 }
+
             });
         }
 
         function updateCartIcon(cartCount) {
-            $('.cart-icon .badge').text(cartCount); // อัปเดตจำนวนสินค้าในตะกร้า
+            $('.cart-icon .badge').text(cartCount); // Update cart icon badge
         }
-    </script>
 
-    <script>
         function changeQuantity(amount, id) {
             var quantityInput = document.getElementById('quantity-' + id);
             var currentQuantity = parseInt(quantityInput.value, 10);
             var newQuantity = currentQuantity + amount;
 
-            if (newQuantity >= 0) {
-                quantityInput.value = newQuantity; // Update visible quantity
-                hiddenQuantityInput.value = newQuantity; // Update hidden input
+            if (newQuantity >= 1) {
+                quantityInput.value = newQuantity;
             }
         }
-
+    </script>
+    <script>
         function openTab(tabName) {
             var i;
             var x = document.getElementsByClassName("menu-items");
@@ -311,13 +315,21 @@ if ($result_dessert === false) {
             event.currentTarget.classList.add("active");
         }
     </script>
+    <script>
+        function clearCustomerForm() {
+            document.getElementById('customer-count-form').reset();
+        }
+
+        document.getElementById('customer-count-form').onsubmit = function() {
+            clearCustomerForm();
+        };
+    </script>
 </head>
 
 <body>
     <header class="navbar">
         <img src="img/logo.jpg" alt="Logo">
     </header>
-    <br>
     <div class="tab-container">
         <div class="tab active" onclick="openTab('menu_food')">สั่งเมนูอาหาร</div>
         <div class="tab" onclick="openTab('menu_drink')">สั่งเครื่องดื่ม</div>
@@ -325,7 +337,18 @@ if ($result_dessert === false) {
     </div>
 
     <main>
-        <!-- เมนูอาหาร -->
+        <div id=pd>
+            <form id="customer-count-form" action="menu_order_buffet.php" method="POST">
+                <label for="adults">จำนวนผู้ใหญ่:</label>
+                <input type="number" id="adults" name="adults" value="<?php echo isset($_SESSION['adults']) ? $_SESSION['adults'] : 1; ?>" min="1">
+                <label for="children">จำนวนเด็ก:</label>
+                <input type="number" id="children" name="children" value="<?php echo isset($_SESSION['children']) ? $_SESSION['children'] : 0; ?>" min="0">
+                <div id="btn">
+                    <button type="submit" name="update_customer_count">อัปเดตจำนวนลูกค้า</button>
+                </div>
+                
+            </form>
+        </div>
         <section id="menu_food" class="menu-items" style="display: flex;">
             <?php
             while ($row = $result_food->fetch_assoc()) {
@@ -397,7 +420,7 @@ if ($result_dessert === false) {
                 echo "</div>";
             }
             ?>
-        </section>
+
     </main>
 
     <a href="cart_buffet.php" class="cart-icon">

@@ -123,10 +123,10 @@ $result_alacarte = $conn->query($sql_alacarte);
                         <li class="breadcrumb-item active">จัดการออเดอร์</li>
                     </ol>
                     <div class="mb-4">
-                                <a href="menu_order_buffet.php" class="btn btn-primary">สั่งออเดอร์บุฟเฟ่ต์</a>.
-                                <a href="menu_order_pickup.php" class="btn btn-primary">สั่งออเดอร์กลับบ้าน</a>
-                            </div>
-                            
+                        <a href="menu_order_buffet.php" class="btn btn-primary">สั่งออเดอร์บุฟเฟ่ต์</a>.
+                        <a href="menu_order_pickup.php" class="btn btn-primary">สั่งออเดอร์กลับบ้าน</a>
+                    </div>
+
                     <!-- ตารางสำหรับข้อมูลบุฟเฟ่ต์ -->
                     <div class="card mb-4">
                         <div class="card-header">
@@ -158,6 +158,11 @@ $result_alacarte = $conn->query($sql_alacarte);
                                             <td><?php echo $row['hc']; ?></td>
                                             <td><?php echo $row['price_ad']; ?></td>
                                             <td><?php echo $row['price_ch']; ?></td>
+                                            <td>
+                                                <a href="order_details.php?orderbf_id=<?php echo $row['orderbf_id']; ?>" class="btn btn-info">
+                                                    ดูรายละเอียด
+                                                </a>
+                                            </td>
                                         </tr>
                                     <?php } ?>
                                 </tbody>

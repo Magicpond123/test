@@ -4,28 +4,8 @@ include 'includes/db_connect.php';
 
 date_default_timezone_set('Asia/Bangkok');
 
-// Initialize cart for buffet if not already set
 if (!isset($_SESSION['cart_buffet'])) {
     $_SESSION['cart_buffet'] = [];
-}
-
-// Add item to buffet cart
-if (isset($_POST['item_id']) && isset($_POST['quantity'])) {
-    $item_id = htmlspecialchars($_POST['item_id']);
-    $quantity = (int)$_POST['quantity'];
-
-    // Check if item already in buffet cart
-    if (isset($_SESSION['cart_buffet'][$item_id])) {
-        $_SESSION['cart_buffet'][$item_id]['quantity'] += $quantity;
-    } else {
-        $_SESSION['cart_buffet'][$item_id] = [
-            'quantity' => $quantity,
-            'price' => htmlspecialchars($_POST['price']),
-            'image' => htmlspecialchars($_POST['image'])
-        ];
-    }
-    header("Location: cart_buffet.php");
-    exit();
 }
 
 // Remove item from buffet cart
@@ -44,34 +24,44 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
         $table_id = 2;
         $emp_id = 2;
         $order_date = date('Y-m-d H:i:s');
+        $adults = $_SESSION['adults'];
+        $children = $_SESSION['children'];
+        $price_adults = $_SESSION['price_adults'];
+        $price_children = $_SESSION['price_children'];
 
         // Insert into order_buffet table
-        $stmt = $conn->prepare("INSERT INTO order_buffet (table_id, emp_id, order_date) VALUES (?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO order_buffet (table_id, emp_id, order_date, ad, hc, price_ad, price_ch) VALUES (?, ?, ?, ?, ?, ?, ?)");
         if ($stmt === false) {
             die('Prepare failed: ' . htmlspecialchars($conn->error));
         }
-        $stmt->bind_param("iis", $table_id, $emp_id, $order_date);
+        $stmt->bind_param("iisiiii", $table_id, $emp_id, $order_date, $adults, $children, $price_adults, $price_children);
         if (!$stmt->execute()) {
             throw new Exception("Buffet order insertion failed: " . $stmt->error);
         }
         $orderbf_id = $stmt->insert_id;
         $stmt->close();
-
+        
         foreach ($_SESSION['cart_buffet'] as $item_id => $details) {
-            $stmt = $conn->prepare("INSERT INTO order_bd (orderbf_id, item_id, quantity) VALUES (?, ?, ?)");
+            $status = 1; // Set status to 1 for all items
+            $stmt = $conn->prepare("INSERT INTO order_bd (orderbf_id, item_id, quantity, status) VALUES (?, ?, ?, ?)");
             if ($stmt === false) {
                 die('Prepare failed: ' . htmlspecialchars($conn->error));
             }
             $quantity = $details['quantity'];
-            $stmt->bind_param("iii", $orderbf_id, $item_id, $quantity);
+            $stmt->bind_param("iiii", $orderbf_id, $item_id, $quantity, $status);
             if (!$stmt->execute()) {
                 throw new Exception("Buffet order details insertion failed: " . $stmt->error);
             }
             $stmt->close();
         }
 
-        // Clear the buffet cart
+        // Clear the buffet cart and session variables
         $_SESSION['cart_buffet'] = [];
+        $_SESSION['adults'] = 1;
+        $_SESSION['children'] = 0;
+        $_SESSION['price_adults'] = 0;
+        $_SESSION['price_children'] = 0;
+
         $conn->commit(); // Commit transaction
         header("Location: success_page_buffet.php");
         exit();
@@ -186,6 +176,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
             background-color: #45a049;
         }
     </style>
+
+
 </head>
 
 <body>
@@ -225,10 +217,11 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
                         </div>
                     </div>
                 <?php endforeach; ?>
-                <form action="cart_buffet.php" method="POST">
+                <form id="orderForm" action="cart_buffet.php" method="POST">
                     <input type="hidden" name="action" value="complete_order">
-                    <button type="submit" class="checkout-btn" onclick="completeOrder()">สั่งอาหาร</button>
+                    <button type="button" class="checkout-btn" onclick="completeOrder()">สั่งอาหาร</button>
                 </form>
+
             <?php endif; ?>
         </div>
         <a href="menu_order_buffet.php" class="checkout-btn">กลับไปที่เมนูอาหาร</a>
@@ -249,7 +242,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
                 cancelButtonText: 'ยกเลิก'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.querySelector('form[action="cart_buffet.php"]').submit();
+                    document.getElementById('orderForm').submit();
                 }
             });
         }
