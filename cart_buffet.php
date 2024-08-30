@@ -16,6 +16,19 @@ if (isset($_POST['remove'])) {
     }
 }
 
+// Update item quantity in buffet cart
+if (isset($_POST['update_quantity'])) {
+    $item_id = htmlspecialchars($_POST['item_id']);
+    $new_quantity = (int) $_POST['quantity'];
+    if (isset($_SESSION['cart_buffet'][$item_id])) {
+        if ($new_quantity <= 0) {
+            unset($_SESSION['cart_buffet'][$item_id]);
+        } else {
+            $_SESSION['cart_buffet'][$item_id]['quantity'] = $new_quantity;
+        }
+    }
+}
+
 // Complete buffet order
 if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
     $orderSuccess = true;
@@ -72,7 +85,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="th">
 
@@ -80,104 +92,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ตะกร้าสินค้า (บุฟเฟ่ต์)</title>
-    <link rel="stylesheet" href="css/styles1.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f8f8;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            height: 100vh;
-        }
-
-        .page-container {
-            width: 100%;
-            max-width: 800px;
-            padding: 20px;
-            background-color: #F5EDED;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            box-sizing: border-box;
-            margin-top: 20px;
-        }
-
-        .header-container {
-            text-align: center;
-        }
-
-        h1 {
-            background-color: #4CAF50;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            border: 3px solid #388E3C;
-            display: inline-block;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .cart-container {
-            margin: 20px 0;
-            padding: 20px;
-            background-color: #fff;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-        }
-
-        .cart-item img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 5px;
-            margin-right: 20px;
-        }
-
-        .cart-item div {
-            text-align: left;
-        }
-
-        .cart-item p {
-            margin: 5px 0;
-        }
-
-        .checkout-btn,
-        .remove-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 18px;
-        }
-
-        .remove-btn {
-            background-color: #f44336;
-        }
-
-        .remove-btn:hover {
-            background-color: #e53935;
-        }
-
-        .checkout-btn:hover {
-            background-color: #45a049;
-        }
-    </style>
-
-
+    <link rel="stylesheet" href="css/cart_buffet.css">
 </head>
 
 <body>
@@ -207,7 +122,14 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
                         <div>
                             <h3><?php echo htmlspecialchars($name); ?></h3>
                             <p>ราคา: <?php echo htmlspecialchars($price); ?> บาท</p>
-                            <p>จำนวน: <?php echo htmlspecialchars($details['quantity']); ?></p>
+                            <p>จำนวน:
+                                <div class="quantity-controls">
+                                    <button type="button" class="quantity-btn" onclick="updateQuantity('<?php echo htmlspecialchars($item_id); ?>', -1)">-</button>
+                                    <input type="text" id="quantity_<?php echo htmlspecialchars($item_id); ?>" value="<?php echo htmlspecialchars($details['quantity']); ?>" readonly>
+                                    <input type="hidden" id="hidden_quantity_<?php echo htmlspecialchars($item_id); ?>" value="<?php echo htmlspecialchars($details['quantity']); ?>">
+                                    <button type="button" class="quantity-btn" onclick="updateQuantity('<?php echo htmlspecialchars($item_id); ?>', 1)">+</button>
+                                </div>
+                            </p>
                         </div>
                         <div style="text-align: center;">
                             <form action="cart_buffet.php" method="POST">
@@ -221,7 +143,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
                     <input type="hidden" name="action" value="complete_order">
                     <button type="button" class="checkout-btn" onclick="completeOrder()">สั่งอาหาร</button>
                 </form>
-
             <?php endif; ?>
         </div>
         <a href="menu_order_buffet.php" class="checkout-btn">กลับไปที่เมนูอาหาร</a>
@@ -230,6 +151,29 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
     <!-- SweetAlert2 Integration -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        function updateQuantity(itemId, change) {
+            const quantityInput = document.getElementById('quantity_' + itemId);
+            let currentQuantity = parseInt(quantityInput.value, 10);
+            let newQuantity = currentQuantity + change;
+
+            // Ensure new quantity is not below 1
+            if (newQuantity < 1) {
+                newQuantity = 1;
+            }
+
+            // Update the display
+            quantityInput.value = newQuantity;
+
+            // Update the hidden input field
+            document.getElementById('hidden_quantity_' + itemId).value = newQuantity;
+
+            // Send AJAX request to update quantity in the server
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "cart_buffet.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.send("update_quantity=1&item_id=" + encodeURIComponent(itemId) + "&quantity=" + encodeURIComponent(newQuantity));
+        }
+
         function completeOrder() {
             Swal.fire({
                 title: 'ยืนยันการสั่งซื้อ',
