@@ -159,7 +159,7 @@ $result_alacarte = $conn->query($sql_alacarte);
                                             <td><?php echo $row['price_adult']; ?></td>
                                             <td><?php echo $row['price_child']; ?></td>
                                             <td>
-                                                <a href="order_details.php?orderbf_id=<?php echo $row['order_buffet_id']; ?>" class="btn btn-info">
+                                                <a href="order_details.php?order_buffet_id=<?php echo $row['order_buffet_id']; ?>" class="btn btn-info">
                                                     ดูรายละเอียด
                                                 </a>
                                             </td>

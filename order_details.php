@@ -2,7 +2,11 @@
 session_start();
 include 'includes/db_connect.php';
 
-$orderbf_id = $_GET['orderbf_id'];
+if (!isset($_GET['order_buffet_id'])) {
+    die('Error: order_buffet_id is missing from the URL.');
+}
+
+$order_buffet_id = $_GET['order_buffet_id'];
 
 // Prepare SQL statement
 $sql = "SELECT d.item_id, d.quantity, m.name, m.price, d.status
@@ -14,7 +18,7 @@ if ($stmt === false) {
     die('Prepare failed: ' . htmlspecialchars($conn->error));
 }
 
-$stmt->bind_param("i", $orderbf_id);
+$stmt->bind_param("i", $order_buffet_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -35,13 +39,13 @@ $status_options = [
 if (isset($_POST['update_status'])) {
     $item_id = $_POST['item_id'];
     $new_status = $_POST['status'];
-    $update_sql = "UPDATE order_bd SET status = ? WHERE orderbf_id = ? AND item_id = ?";
+    $update_sql = "UPDATE order_buffet_details SET status = ? WHERE order_buffet_id = ? AND item_id = ?";
     $update_stmt = $conn->prepare($update_sql);
     if ($update_stmt === false) {
         die('Update prepare failed: ' . htmlspecialchars($conn->error));
     }
 
-    $update_stmt->bind_param("sii", $new_status, $orderbf_id, $item_id);
+    $update_stmt->bind_param("sii", $new_status, $order_buffet_id, $item_id);
     if ($update_stmt->execute()) {
         echo "<script>alert('สถานะออเดอร์ถูกอัปเดตแล้ว');</script>";
     } else {
@@ -50,7 +54,7 @@ if (isset($_POST['update_status'])) {
     $update_stmt->close();
     
     // Reload the page to see the updated status
-    header("Location: order_details.php?orderbf_id=" . $orderbf_id);
+    header("Location: order_details.php?order_buffet_id=" . $order_buffet_id);
     exit();
 }
 ?>
@@ -64,7 +68,7 @@ if (isset($_POST['update_status'])) {
 </head>
 <body>
     <div class="container mt-5">
-        <h2>รายละเอียดออเดอร์ #<?php echo $orderbf_id; ?></h2>
+        <h2>รายละเอียดออเดอร์ #<?php echo $order_buffet_id; ?></h2>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -85,7 +89,7 @@ if (isset($_POST['update_status'])) {
                         <td><?php echo number_format($row['price'] * $row['quantity'], 2); ?></td>
                         <td><?php echo htmlspecialchars($status_options[$row['status']]); ?></td>
                         <td>
-                            <form action="order_details.php?orderbf_id=<?php echo $orderbf_id; ?>" method="POST">
+                            <form action="order_details.php?order_buffet_id=<?php echo $order_buffet_id; ?>" method="POST">
                                 <input type="hidden" name="item_id" value="<?php echo $row['item_id']; ?>">
                                 <select name="status" class="form-select">
                                     <?php foreach ($status_options as $value => $label) { ?>

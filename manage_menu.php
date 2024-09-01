@@ -4,16 +4,18 @@ if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit();
 }
+
 include 'includes/db_connect.php';
 
 // Fetch menu items data
-$sql = "SELECT menuitems.item_id, menuitems.name, menuitems.description, menuitems.price, menuitems.image_path, menuitems.order_type , 
-               category.type AS category, unit.name AS unit 
-        FROM menuitems 
-        JOIN category ON menuitems.category_id = category.category_id 
-        JOIN unit ON menuitems.unit_id = unit.unit_id";
+$sql = "SELECT mi.item_id, mi.name, mi.description, mi.price, mi.image_path, mi.order_type, 
+               c.type AS category, u.name AS unit 
+        FROM menuitems mi 
+        JOIN category c ON mi.category_id = c.category_id 
+        JOIN unit u ON mi.unit_id = u.unit_id";
 $result = $conn->query($sql);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,14 +26,7 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function checker() {
-            var result = confirm('คุณต้องการออกจากระบบหรือไม่?');
-            if (result == false) {
-                event.preventDefault();
-            }
-        }
-    </script>
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
@@ -46,15 +41,34 @@ $result = $conn->query($sql);
             $.ajax({
                 url: "fetch_item_details.php",
                 method: "POST",
-                data: {
-                    id: itemId
-                },
+                data: { id: itemId },
                 success: function(data) {
-                    // เปิด modal และแสดงข้อมูลที่ได้จาก server
                     $('#itemDetailsModal .modal-body').html(data);
                     $('#itemDetailsModal').modal('show');
                 }
             });
+        }
+
+        function deleteItem(item_id) {
+            Swal.fire({
+                title: "คุณต้องการลบหรือไม่?",
+                text: "",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `delete_menu_item.php?id=${item_id}`;
+                }
+            });
+        }
+
+        function logoutCheck(event) {
+            if (!confirm('คุณต้องการออกจากระบบหรือไม่?')) {
+                event.preventDefault();
+            }
         }
     </script>
 </head>
@@ -62,7 +76,9 @@ $result = $conn->query($sql);
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="index.php">ต้วงหมูกะทะ</a>
-        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!">
+            <i class="fas fa-bars"></i>
+        </button>
         <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
             <div class="input-group">
                 <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
@@ -73,15 +89,11 @@ $result = $conn->query($sql);
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-user fa-fw"></i>
-                    <?php if (isset($_SESSION['username'])) : ?>
-                        <?php echo $_SESSION['username']; ?>
-                    <?php else : ?>
-                        ผู้เยี่ยมชม
-                    <?php endif; ?>
+                    <?= isset($_SESSION['username']) ? $_SESSION['username'] : 'ผู้เยี่ยมชม'; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])) : ?>
-                        <li><a class="dropdown-item" href="logout.php">ออกจากระบบ</a></li>
+                        <li><a class="dropdown-item" href="logout.php" onclick="logoutCheck(event)">ออกจากระบบ</a></li>
                     <?php else : ?>
                         <li><a class="dropdown-item" href="login.php">เข้าสู่ระบบ</a></li>
                     <?php endif; ?>
@@ -89,6 +101,7 @@ $result = $conn->query($sql);
             </li>
         </ul>
     </nav>
+
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
@@ -128,14 +141,12 @@ $result = $conn->query($sql);
                 </div>
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                    <?php if (isset($_SESSION['username'])) : ?>
-                        <?php echo $_SESSION['username']; ?>
-                    <?php else : ?>
-                        Guest
-                    <?php endif; ?>
+                    <?= isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'; ?>
                 </div>
             </nav>
         </div>
+
+        <!-- Modal for item details -->
         <div class="modal fade" id="itemDetailsModal" tabindex="-1" role="dialog" aria-labelledby="itemDetailsModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -146,7 +157,7 @@ $result = $conn->query($sql);
                         </button>
                     </div>
                     <div class="modal-body">
-                        <!-- ข้อมูลรายละเอียดจะถูกเพิ่มที่นี่ -->
+                        <!-- Details content will be loaded here -->
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
@@ -154,6 +165,7 @@ $result = $conn->query($sql);
                 </div>
             </div>
         </div>
+
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
@@ -182,36 +194,38 @@ $result = $conn->query($sql);
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php
-                                    $i = 1;
-                                    while ($row = $result->fetch_assoc()) { ?>
+                                    <?php $i = 1; ?>
+                                    <?php while ($row = $result->fetch_assoc()) : ?>
                                         <tr>
-                                            <td style="text-align: center;"><?php echo $i++; ?></td>
-                                            <td style="text-align: left;"><?php echo $row['name']; ?></td>
-                                            <td style="text-align: right;"><?php echo number_format($row['price'], 2); ?></td>
-                                            <td style="text-align: left;"><?php echo $row['category']; ?></td>
-                                            <td style="text-align: left;"><?php echo $row['unit']; ?></td>
+                                            <td style="text-align: center;"><?= $i++; ?></td>
+                                            <td style="text-align: left;"><?= htmlspecialchars($row['name']); ?></td>
+                                            <td style="text-align: right;"><?= number_format($row['price'], 2); ?></td>
+                                            <td style="text-align: left;"><?= htmlspecialchars($row['category']); ?></td>
+                                            <td style="text-align: left;"><?= htmlspecialchars($row['unit']); ?></td>
                                             <td style="text-align: left;">
                                                 <?php
-                                                if ($row['order_type'] == 1) {
-                                                    echo "บุฟเฟ่ต์";
-                                                } elseif ($row['order_type'] == 2) {
-                                                    echo "อะลาคาร์ท";
-                                                } else {
-                                                    echo "ไม่ทราบประเภท";
+                                                switch ($row['order_type']) {
+                                                    case 1:
+                                                        echo "บุฟเฟ่ต์";
+                                                        break;
+                                                    case 2:
+                                                        echo "อะลาคาร์ท";
+                                                        break;
+                                                    default:
+                                                        echo "ไม่ทราบประเภท";
+                                                        break;
                                                 }
                                                 ?>
                                             </td>
                                             <td style="text-align: center;">
-                                                <a href="edit_menu_item.php?id=<?php echo $row['item_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
-                                                <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['item_id']; ?>">ลบ</button>
+                                                <a href="edit_menu_item.php?id=<?= $row['item_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
+                                                <button class="btn btn-danger btn-sm delete-btn" data-id="<?= $row['item_id']; ?>" onclick="deleteItem(<?= $row['item_id']; ?>)">ลบ</button>
                                             </td>
-                                            <td>
-                                                <a href="javascript:void(0);" class="btn btn-info btn-sm" data-id="<?php echo $row['item_id']; ?>" onclick="showDetails(<?php echo $row['item_id']; ?>)">ดูรายละเอียด</a>
+                                            <td style="text-align: center;">
+                                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="showDetails(<?= $row['item_id']; ?>)">ดูรายละเอียด</a>
                                             </td>
-
                                         </tr>
-                                    <?php } ?>
+                                    <?php endwhile; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -237,23 +251,3 @@ $result = $conn->query($sql);
 </body>
 
 </html>
-<script>
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const item_id = this.getAttribute('data-id');
-            Swal.fire({
-                title: "คุณต้องการลบหรือไม่?",
-                text: "",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = `delete_menu_item.php?id=${item_id}`;
-                }
-            });
-        });
-    });
-</script>
