@@ -7,13 +7,13 @@ if (!isset($_SESSION['username'])) {
 include 'includes/db_connect.php';
 
 // ดึงข้อมูลจาก order_buffet (บุฟเฟ่ต์)
-$sql_buffet = "SELECT o.orderbf_id, o.table_id, e.firstname, e.lastname, o.order_date, o.hc, o.ad, o.price_ad, o.price_ch 
+$sql_buffet = "SELECT o.order_buffet_id, o.table_id, e.firstname, e.lastname, o.order_date, o.child, o.adult, o.price_adult, o.price_child 
                FROM order_buffet o
                JOIN employees e ON o.emp_id = e.emp_id";
 $result_buffet = $conn->query($sql_buffet);
 
 // ดึงข้อมูลจาก order_pickup (อะลาคาร์ท)
-$sql_alacarte = "SELECT o.orderpk_id, e.firstname, e.lastname, o.order_date 
+$sql_alacarte = "SELECT o.order_pickup_id, e.firstname, e.lastname, o.order_date 
                  FROM order_pickup o
                  JOIN employees e ON o.emp_id = e.emp_id";
 $result_alacarte = $conn->query($sql_alacarte);
@@ -150,16 +150,16 @@ $result_alacarte = $conn->query($sql_alacarte);
                                 <tbody>
                                     <?php while ($row = $result_buffet->fetch_assoc()) { ?>
                                         <tr>
-                                            <td><?php echo $row['orderbf_id']; ?></td>
+                                            <td><?php echo $row['order_buffet_id']; ?></td>
                                             <td><?php echo $row['table_id']; ?></td>
                                             <td><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
                                             <td><?php echo $row['order_date']; ?></td>
-                                            <td><?php echo $row['ad']; ?></td>
-                                            <td><?php echo $row['hc']; ?></td>
-                                            <td><?php echo $row['price_ad']; ?></td>
-                                            <td><?php echo $row['price_ch']; ?></td>
+                                            <td><?php echo $row['adult']; ?></td>
+                                            <td><?php echo $row['adult']; ?></td>
+                                            <td><?php echo $row['price_adult']; ?></td>
+                                            <td><?php echo $row['price_child']; ?></td>
                                             <td>
-                                                <a href="order_details.php?orderbf_id=<?php echo $row['orderbf_id']; ?>" class="btn btn-info">
+                                                <a href="order_details.php?orderbf_id=<?php echo $row['order_buffet_id']; ?>" class="btn btn-info">
                                                     ดูรายละเอียด
                                                 </a>
                                             </td>
