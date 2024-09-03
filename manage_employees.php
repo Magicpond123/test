@@ -23,23 +23,17 @@ if (!$result) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
-    <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-    <!-- Bootstrap JS -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <a class="navbar-brand ps-3" href="index.php">ต้วงหมูกะทะ</a>
-        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle"><i class="fas fa-bars"></i></button>
         <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
             <div class="input-group">
-                <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                <input class="form-control" type="text" placeholder="Search for..." aria-label="Search" />
                 <button class="btn btn-danger" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
             </div>
         </form>
@@ -47,11 +41,7 @@ if (!$result) {
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-user fa-fw"></i>
-                    <?php if (isset($_SESSION['username'])) : ?>
-                        <?php echo $_SESSION['username']; ?>
-                    <?php else : ?>
-                        ผู้เยี่ยมชม
-                    <?php endif; ?>
+                    <?= isset($_SESSION['username']) ? $_SESSION['username'] : 'ผู้เยี่ยมชม'; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <?php if (isset($_SESSION['username'])) : ?>
@@ -63,6 +53,7 @@ if (!$result) {
             </li>
         </ul>
     </nav>
+
     <!-- Employee Details Modal -->
     <div class="modal fade" id="employeeDetailsModal" tabindex="-1" aria-labelledby="employeeDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -120,11 +111,7 @@ if (!$result) {
                 </div>
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                    <?php if (isset($_SESSION['username'])) : ?>
-                        <?php echo $_SESSION['username']; ?>
-                    <?php else : ?>
-                        Guest
-                    <?php endif; ?>
+                    <?= isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest'; ?>
                 </div>
             </nav>
         </div>
@@ -160,50 +147,39 @@ if (!$result) {
                                 <tbody>
                                     <?php
                                     $i = 1;
-                                    while ($row = $result->fetch_assoc()) { ?>
+                                    while ($row = $result->fetch_assoc()) : ?>
                                         <tr>
-                                            <td style="text-align: center;"><?php echo $i++; ?></td>
-                                            <td style="text-align: center;"><?php echo $row['username']; ?></td>
-                                            <td style="text-align: center;"><?php echo $row['firstname']; ?></td>
-                                            <td style="text-align: center;"><?php echo $row['lastname']; ?></td>
+                                            <td style="text-align: center;"><?= $i++; ?></td>
+                                            <td style="text-align: center;"><?= $row['username']; ?></td>
+                                            <td style="text-align: center;"><?= $row['firstname']; ?></td>
+                                            <td style="text-align: center;"><?= $row['lastname']; ?></td>
                                             <td style="text-align: center;">
                                                 <?php
-                                                switch ($row['role']) {
-                                                    case 1:
-                                                        echo 'เจ้าของ';
-                                                        break;
-                                                    case 2:
-                                                        echo 'แคชเชียร์';
-                                                        break;
-                                                    case 3:
-                                                        echo 'พนักงานต้อนรับ';
-                                                        break;
-                                                    case 4:
-                                                        echo 'พนักงานครัว';
-                                                        break;
-                                                    case 5:
-                                                        echo 'ลาออก';
-                                                    default:
-                                                        echo 'ไม่ทราบ';
-                                                }
+                                                $roles = [
+                                                    1 => 'เจ้าของ',
+                                                    2 => 'แคชเชียร์',
+                                                    3 => 'พนักงานต้อนรับ',
+                                                    4 => 'พนักงานครัว',
+                                                    5 => 'ลาออก'
+                                                ];
+                                                echo $roles[$row['role']] ?? 'ไม่ทราบ';
                                                 ?>
                                             </td>
-                                            <td style="text-align: center;"><?php
-                                                                            if ($row['status'] == 1) echo 'ออนไลน์';
-                                                                            elseif ($row['status'] == 2) echo 'ออฟไลน์';
-                                                                            else echo 'ลาออก'; ?>
+                                            <td style="text-align: center;">
+                                                <?= $row['status'] == 1 ? 'ออนไลน์' : ($row['status'] == 2 ? 'ออฟไลน์' : 'ลาออก'); ?>
                                             </td>
                                             <td style="text-align: center;">
-                                                <a href="edit_employee.php?id=<?php echo $row['emp_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
-                                                <a href="delete_employee.php?id=<?php echo $row['emp_id']; ?>" class="btn btn-danger btn-sm">ลบ</a>
+                                                <a href="edit_employee.php?id=<?= $row['emp_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
+                                                <a href="delete_employee.php?id=<?= $row['emp_id']; ?>" class="btn btn-danger btn-sm">ลบ</a>
                                             </td>
-                                            <td>
+                                            <td style="text-align: center;">
                                                 <!-- Button trigger modal -->
-                                                <button type="button" class="btn btn-info btn-sm view-details" data-id="<?php echo $row['emp_id']; ?>">
+                                                <button type="button" class="btn btn-info btn-sm view-details" data-id="<?= $row['emp_id']; ?>">
                                                     แสดงรายละเอียด
                                                 </button>
+                                            </td>
                                         </tr>
-                                    <?php } ?>
+                                    <?php endwhile; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -230,7 +206,7 @@ if (!$result) {
         document.querySelectorAll('.view-details').forEach(button => {
             button.addEventListener('click', function() {
                 const empId = this.getAttribute('data-id');
-                fetch('fetch_employee_details.php?id=' + empId)
+                fetch(`fetch_employee_details.php?id=${empId}`)
                     .then(response => response.text())
                     .then(data => {
                         document.querySelector('#employeeDetailsModal .modal-body').innerHTML = data;
@@ -239,9 +215,5 @@ if (!$result) {
             });
         });
     </script>
-
-
-
 </body>
-
 </html>
