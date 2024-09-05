@@ -96,6 +96,10 @@ if (!$result) {
                             <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
                             จัดการออเดอร์
                         </a>
+                        <a class="nav-link" href="cashier.php">
+                            <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
+                            ชำระเงิน
+                        </a>
                     </div>
                 </div>
                 <div class="sb-sidenav-footer">

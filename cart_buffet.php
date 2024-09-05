@@ -39,7 +39,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
         $order_date = date('Y-m-d H:i:s');
         $adults = $_SESSION['adults'];
         $children = $_SESSION['children'];
-        $price_adults = $_SESSION['price_adult'];
+        $price_adults = $_SESSION['price_adults'];
         $price_children = $_SESSION['price_children'];
 
         // Insert into order_buffet table
