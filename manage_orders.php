@@ -188,7 +188,7 @@ $result_alacarte = $conn->query($sql_alacarte);
                                 <tbody>
                                     <?php while ($row = $result_alacarte->fetch_assoc()) { ?>
                                         <tr>
-                                            <td><?php echo $row['orderpk_id']; ?></td>
+                                            <td><?php echo $row['order_pickup_id']; ?></td>
                                             <td><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
                                             <td><?php echo $row['order_date']; ?></td>
                                         </tr>

@@ -7,7 +7,7 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>การสั่งซื้อสำเร็จ</title>
+    <title>สั่งสำเร็จ</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -58,7 +58,7 @@ session_start();
 </head>
 <body>
     <div class="success-container">
-        <h1>การสั่งซื้อสำเร็จ!</h1>
+        <h1>สั่งสำเร็จ!</h1>
         <p>ขอบคุณสำหรับการสั่งซื้อของคุณ.</p>
         <a href="menu_order_buffet.php">กลับไปที่เมนูอาหาร</a>
     </div>
