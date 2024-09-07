@@ -2,6 +2,17 @@
 session_start();
 include 'includes/db_connect.php';
 
+// จัดการการเลือกโต๊ะและเก็บใน Session
+if (isset($_POST['table_id'])) {
+    $_SESSION['table_id'] = $_POST['table_id'];
+}
+
+// ตรวจสอบว่าผู้ใช้ได้เลือกโต๊ะหรือยัง
+if (!isset($_SESSION['table_id'])) {
+    echo 'กรุณาเลือกโต๊ะก่อนทำการสั่งอาหาร';
+    exit(); // หยุดการทำงานเพิ่มเติมจนกว่าจะมีการเลือกโต๊ะ
+}
+
 if (isset($_POST['add_to_cart'])) {
     $item_id = $_POST['item_id'];
     $quantity = (int) $_POST['quantity'];
@@ -24,13 +35,7 @@ if (isset($_POST['add_to_cart'])) {
     exit;
 }
 
-$sql_buffet = "SELECT * FROM menuitems WHERE order_type = 1";
-$result_buffet = $conn->query($sql_buffet);
-
-if ($result_buffet === false) {
-    die("Error: " . $conn->error);
-}
-
+// Query สำหรับดึงเมนู
 $sql_food = "SELECT * FROM menuitems WHERE category_id = 1 AND order_type = 1";
 $result_food = $conn->query($sql_food);
 
@@ -39,6 +44,10 @@ $result_drink = $conn->query($sql_drink);
 
 $sql_dessert = "SELECT * FROM menuitems WHERE category_id = 3 AND order_type = 1";
 $result_dessert = $conn->query($sql_dessert);
+
+// Query ดึงข้อมูลโต๊ะ
+$sql_tables = "SELECT table_id, table_number FROM tables WHERE table_status = 1";
+$result_tables = $conn->query($sql_tables);
 
 if (isset($_POST['update_customer_count'])) {
     $_SESSION['adults'] = (int) $_POST['adults'];
@@ -51,10 +60,9 @@ if (isset($_POST['update_customer_count'])) {
     $_SESSION['price_children'] = $price_children;
 
     header("Location: menu_order_buffet.php");
-    exit;
+    exit();
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="th">
@@ -71,7 +79,7 @@ if (isset($_POST['update_customer_count'])) {
             var quantity = $('#quantity-' + itemId).val();
             $.ajax({
                 type: 'POST',
-                url: 'menu_order_buffet.php', // คุณควรจะชี้ไปที่ไฟล์ที่จัดการการเพิ่มสินค้าในตะกร้า
+                url: 'menu_order_buffet.php',
                 data: {
                     item_id: itemId,
                     quantity: quantity,
@@ -84,7 +92,7 @@ if (isset($_POST['update_customer_count'])) {
                         updateCartIcon(response.cart_count);
                         alert('เพิ่มสินค้าลงตะกร้าเรียบร้อยแล้ว!');
                     } else {
-                        alert('เกิดข้อผิดพลาดในการอัพเดตไอคอนตะกร้าสินค้า');
+                        alert('เกิดข้อผิดพลาดในการอัพเดตไอคอนตะกร้า');
                     }
                 },
                 error: function() {
@@ -95,7 +103,7 @@ if (isset($_POST['update_customer_count'])) {
         }
 
         function updateCartIcon(cartCount) {
-            $('.cart-icon .badge').text(cartCount); // Update cart icon badge
+            $('.cart-icon .badge').text(cartCount);
         }
 
         function changeQuantity(amount, id) {
@@ -107,43 +115,53 @@ if (isset($_POST['update_customer_count'])) {
                 quantityInput.value = newQuantity;
             }
         }
-    </script>
-    <script>
+
         function openTab(tabName) {
             var i;
             var x = document.getElementsByClassName("menu-items");
             var tabs = document.getElementsByClassName("tab");
 
-            // ซ่อนเมนูทั้งหมด
             for (i = 0; i < x.length; i++) {
                 x[i].style.display = "none";
             }
 
-            // นำ `active` class ออกจาก tab ทั้งหมด
             for (i = 0; i < tabs.length; i++) {
                 tabs[i].classList.remove("active");
             }
 
-            // แสดงเมนูที่เลือกและเพิ่ม `active` class ไปยัง tab ที่เลือก
             document.getElementById(tabName).style.display = "flex";
             event.currentTarget.classList.add("active");
         }
-    </script>
-    <script>
-        function clearCustomerForm() {
-            document.getElementById('customer-count-form').reset();
-        }
-
-        document.getElementById('customer-count-form').onsubmit = function() {
-            clearCustomerForm();
-        };
     </script>
 </head>
 
 <body>
     <header class="navbar">
         <img src="img/logo.jpg" alt="Logo">
+        <div class="table-dropdown">
+            <form action="menu_order_buffet.php" method="POST">
+                <label for="table_id">เลือกโต๊ะ:</label>
+                <select name="table_id" id="table_id" onchange="this.form.submit()">
+                    <?php
+                    // ดึงข้อมูลโต๊ะที่สามารถใช้งานได้จากฐานข้อมูล
+                    $sql_tables = "SELECT table_id, table_number FROM tables WHERE table_status = 1";
+                    $result_tables = $conn->query($sql_tables);
+
+                    if ($result_tables->num_rows > 0) {
+                        while ($row = $result_tables->fetch_assoc()) {
+                            // ตรวจสอบว่าโต๊ะถูกเลือกแล้วหรือยัง
+                            $selected = (isset($_SESSION['table_id']) && $_SESSION['table_id'] == $row['table_id']) ? 'selected' : '';
+                            echo "<option value='" . htmlspecialchars($row['table_id']) . "' $selected>โต๊ะ " . htmlspecialchars($row['table_number']) . "</option>";
+                        }
+                    } else {
+                        echo "<option value=''>ไม่มีโต๊ะว่าง</option>";
+                    }
+                    ?>
+                </select>
+            </form>
+        </div>
     </header>
+
     <div class="tab-container">
         <div class="tab active" onclick="openTab('menu_food')">สั่งเมนูอาหาร</div>
         <div class="tab" onclick="openTab('menu_drink')">สั่งเครื่องดื่ม</div>
@@ -160,81 +178,28 @@ if (isset($_POST['update_customer_count'])) {
                 <div id="btn">
                     <button type="submit" name="update_customer_count">อัปเดตจำนวนลูกค้า</button>
                 </div>
-                
             </form>
         </div>
+
+        <!-- เมนูอาหาร -->
         <section id="menu_food" class="menu-items" style="display: flex;">
-            <?php
-            while ($row = $result_food->fetch_assoc()) {
-                echo "<div class='menu-item'>";
-                echo "<img src='" . htmlspecialchars($row['image_path']) . "' alt='" . htmlspecialchars($row['name']) . "' class='menu-item-image'>";
-                echo "<div class='menu-item-details'>";
-                echo "<h2 class='menu-item-name'>" . htmlspecialchars($row['name']) . "</h2>";
-                echo "<p class='menu-item-price'>ราคา: " . htmlspecialchars($row['price']) . " บาท</p>";
-                echo "<p class='menu-item-description'>" . htmlspecialchars($row['description']) . "</p>";
-                echo "<label for='quantity'>จำนวน:</label>";
-                echo "<div class='quantity-controls'>";
-                echo "<button type='button' class='quantity-btn' onclick='changeQuantity(-1, \"" . htmlspecialchars($row['item_id']) . "\")'>-</button>";
-                echo "<input type='number' id='quantity-" . htmlspecialchars($row['item_id']) . "' name='quantity' value='1' min='1'>";
-                echo "<button type='button' class='quantity-btn' onclick='changeQuantity(1, \"" . htmlspecialchars($row['item_id']) . "\")'>+</button>";
-                echo "</div>";
-                echo "<button type='button' name='add_to_cart' class='add-to-cart-btn' onclick='addToCart(\"" . htmlspecialchars($row['item_id']) . "\")'>เพิ่มในตะกร้า</button>";
-                echo "</div>";
-                echo "</div>";
-            }
-            ?>
+            <?php while ($row = $result_food->fetch_assoc()) { ?>
+                <div class="menu-item">
+                    <img src="<?php echo htmlspecialchars($row['image_path']); ?>" alt="<?php echo htmlspecialchars($row['name']); ?>" class="menu-item-image">
+                    <div class="menu-item-details">
+                        <h2 class="menu-item-name"><?php echo htmlspecialchars($row['name']); ?></h2>
+                        <p class="menu-item-price">ราคา: <?php echo htmlspecialchars($row['price']); ?> บาท</p>
+                        <label for="quantity">จำนวน:</label>
+                        <div class="quantity-controls">
+                            <button type="button" class="quantity-btn" onclick="changeQuantity(-1, '<?php echo htmlspecialchars($row['item_id']); ?>')">-</button>
+                            <input type="number" id="quantity-<?php echo htmlspecialchars($row['item_id']); ?>" name="quantity" value="1" min="1">
+                            <button type="button" class="quantity-btn" onclick="changeQuantity(1, '<?php echo htmlspecialchars($row['item_id']); ?>')">+</button>
+                        </div>
+                        <button type="button" name="add_to_cart" class="add-to-cart-btn" onclick="addToCart('<?php echo htmlspecialchars($row['item_id']); ?>')">เพิ่มในตะกร้า</button>
+                    </div>
+                </div>
+            <?php } ?>
         </section>
-
-
-        <!-- เมนูเครื่องดื่ม -->
-        <section id="menu_drink" class="menu-items">
-            <?php
-            while ($row = $result_drink->fetch_assoc()) {
-                echo "<div class='menu-item'>";
-                echo "<img src='" . htmlspecialchars($row['image_path']) . "' alt='" . htmlspecialchars($row['name']) . "' class='menu-item-image'>";
-                echo "<div class='menu-item-details'>";
-                echo "<h2 class='menu-item-name'>" . htmlspecialchars($row['name']) . "</h2>";
-                echo "<p class='menu-item-price'>ราคา: " . htmlspecialchars($row['price']) . " บาท</p>";
-                echo "<form action='cart_buffet.php' method='POST' class='add-to-cart-form'>";
-                echo "<input type='hidden' name='item_id' value='" . htmlspecialchars($row['item_id']) . "'>";
-                echo "<label for='quantity'>จำนวน:</label>";
-                echo "<div class='quantity-controls'>";
-                echo "<button type='button' class='quantity-btn' onclick='changeQuantity(-1, \"" . htmlspecialchars($row['item_id']) . "\")'>-</button>";
-                echo "<input type='number' id='quantity-" . htmlspecialchars($row['item_id']) . "' name='quantity' value='1' min='1'>";
-                echo "<button type='button' class='quantity-btn' onclick='changeQuantity(1, \"" . htmlspecialchars($row['item_id']) . "\")'>+</button>";
-                echo "</div>";
-                echo "<button type='button' name='add_to_cart' class='add-to-cart-btn' onclick='addToCart(\"" . htmlspecialchars($row['item_id']) . "\")'>เพิ่มในตะกร้า</button>";
-                echo "</form>";
-                echo "</div>";
-                echo "</div>";
-            }
-            ?>
-        </section>
-
-        <!-- เมนูของหวาน -->
-        <section id="menu_dessert" class="menu-items">
-            <?php
-            while ($row = $result_dessert->fetch_assoc()) {
-                echo "<div class='menu-item'>";
-                echo "<img src='" . htmlspecialchars($row['image_path']) . "' alt='" . htmlspecialchars($row['name']) . "' class='menu-item-image'>";
-                echo "<div class='menu-item-details'>";
-                echo "<h2 class='menu-item-name'>" . htmlspecialchars($row['name']) . "</h2>";
-                echo "<p class='menu-item-price'>ราคา: " . htmlspecialchars($row['price']) . " บาท</p>";
-                echo "<form action='cart_buffet.php' method='POST' class='add-to-cart-form'>";
-                echo "<input type='hidden' name='item_id' value='" . htmlspecialchars($row['item_id']) . "'>";
-                echo "<label for='quantity'>จำนวน:</label>";
-                echo "<div class='quantity-controls'>";
-                echo "<button type='button' class='quantity-btn' onclick='changeQuantity(-1, \"" . htmlspecialchars($row['item_id']) . "\")'>-</button>";
-                echo "<input type='number' id='quantity-" . htmlspecialchars($row['item_id']) . "' name='quantity' value='1' min='1'>";
-                echo "<button type='button' class='quantity-btn' onclick='changeQuantity(1, \"" . htmlspecialchars($row['item_id']) . "\")'>+</button>";
-                echo "</div>";
-                echo "<button type='button' name='add_to_cart' class='add-to-cart-btn' onclick='addToCart(\"" . htmlspecialchars($row['item_id']) . "\")'>เพิ่มในตะกร้า</button>";
-                echo "</form>";
-                echo "</div>";
-                echo "</div>";
-            }
-            ?>
-
     </main>
 
     <a href="cart_buffet.php" class="cart-icon">

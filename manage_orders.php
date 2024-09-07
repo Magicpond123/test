@@ -141,28 +141,28 @@ $result_alacarte = $conn->query($sql_alacarte);
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>เลขออเดอร์</th>
-                                        <th>เลขโต๊ะ</th>
-                                        <th>ชื่อพนักงาน</th>
-                                        <th>วันที่</th>
-                                        <th>จำนวนผู้ใหญ่</th>
-                                        <th>จำนวนเด็ก</th>
-                                        <th>ราคาผู้ใหญ่</th>
-                                        <th>ราคาเด็ก</th>
+                                        <th style="text-align: center;">เลขออเดอร์</th>
+                                        <th style="text-align: center;">เลขโต๊ะ</th>
+                                        <th style="text-align: center;">ชื่อพนักงาน</th>
+                                        <th style="text-align: center;">วันที่</th>
+                                        <th style="text-align: center;">จำนวนผู้ใหญ่</th>
+                                        <th style="text-align: center;">จำนวนเด็ก</th>
+                                        <th style="text-align: center;">ราคาผู้ใหญ่</th>
+                                        <th style="text-align: center;">ราคาเด็ก</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php while ($row = $result_buffet->fetch_assoc()) { ?>
                                         <tr>
-                                            <td><?php echo $row['order_buffet_id']; ?></td>
-                                            <td><?php echo $row['table_id']; ?></td>
-                                            <td><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
-                                            <td><?php echo $row['order_date']; ?></td>
-                                            <td><?php echo $row['adult']; ?></td>
-                                            <td><?php echo $row['adult']; ?></td>
-                                            <td><?php echo $row['price_adult']; ?></td>
-                                            <td><?php echo $row['price_child']; ?></td>
-                                            <td>
+                                            <td style="text-align: center;"><?php echo $row['order_buffet_id']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['table_id']; ?></td>
+                                            <td style="text-align: left;"><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['order_date']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['adult']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['adult']; ?></td>
+                                            <td style="text-align: right;"><?php echo $row['price_adult']; ?></td>
+                                            <td style="text-align: right;"><?php echo $row['price_child']; ?></td>
+                                            <td style="text-align: center;">
                                                 <a href="order_details.php?order_buffet_id=<?php echo $row['order_buffet_id']; ?>" class="btn btn-info">
                                                     ดูรายละเอียด
                                                 </a>
@@ -184,17 +184,22 @@ $result_alacarte = $conn->query($sql_alacarte);
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>เลขออเดอร์</th>
-                                        <th>ชื่อพนักงาน</th>
-                                        <th>วันที่</th>
+                                        <th style="text-align: center;">เลขออเดอร์</th>
+                                        <th style="text-align: center;">ชื่อพนักงาน</th>
+                                        <th style="text-align: center;">วันที่</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php while ($row = $result_alacarte->fetch_assoc()) { ?>
                                         <tr>
-                                            <td><?php echo $row['order_pickup_id']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['order_pickup_id']; ?></td>
                                             <td><?php echo $row['firstname'] . ' ' . $row['lastname']; ?></td>
-                                            <td><?php echo $row['order_date']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['order_date']; ?></td>
+                                            <td style="text-align: center;">
+                                                <a href="order_details_pickup.php?order_pickup_id=<?php echo $row['order_pickup_id']; ?>" class="btn btn-info">
+                                                    ดูรายละเอียด
+                                                </a>
+                                            </td>
                                         </tr>
                                     <?php } ?>
                                 </tbody>

@@ -31,8 +31,6 @@ $result = $conn->query($sql);
         }
     </script>
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -119,6 +117,10 @@ $result = $conn->query($sql);
                         <a class="nav-link" href="manage_orders.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
                             จัดการออเดอร์
+                        </a>
+                        <a class="nav-link" href="cashier.php">
+                            <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
+                            ชำระเงิน
                         </a>
                     </div>
                 </div>

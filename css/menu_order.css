@@ -446,3 +446,20 @@ input[type='number'] {
     }
 >>>>>>> a5bd7ba0f7f0d65ac84fcc115a3ede4ad22eb721
 }
+.navbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.table-dropdown {
+    position: absolute;
+    top: 10px; /* ระยะจากด้านบน */
+    left: 10px; /* ระยะจากด้านซ้าย */
+}
+
+.table-dropdown select {
+    padding: 5px;
+    font-size: 14px;
+}

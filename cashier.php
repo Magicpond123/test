@@ -7,8 +7,13 @@ $sql_orders = "SELECT o.order_buffet_id, o.table_id, o.adult, o.child, o.order_d
                FROM order_buffet o";
 $result_orders = $conn->query($sql_orders);
 
+// ดึงข้อมูลออเดอร์สั่งกลับบ้าน
+$sql_pickup_orders = "SELECT o.order_pickup_id, o.emp_id, o.order_date
+                      FROM order_pickup o";
+$result_pickup_orders = $conn->query($sql_pickup_orders);
+
 // ตรวจสอบการทำงานของคำสั่ง SQL
-if (!$result_orders) {
+if (!$result_orders || !$result_pickup_orders) {
     die("Error executing query: " . $conn->error);
 }
 
@@ -42,10 +47,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/cashier.css">
     <script>
-        function goToOrderDetails(orderId) {
-            window.location.href = 'cashier_details.php?order_id=' + orderId;
+        function goToOrderDetails(orderId, type) {
+        if (type === 'buffet') {
+        window.location.href = 'cashier_details.php?order_id=' + orderId;
+        } else if (type === 'pickup') {
+        window.location.href = 'cashier_details_pickup.php?order_pickup_id=' + orderId;
         }
-    </script>
+        }
+        </script>
 </head>
 
 <body>
@@ -55,12 +64,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <!-- แสดงข้อความสถานะ -->
         <?php if (isset($_SESSION['success_message'])): ?>
             <div class="alert alert-success">
-                <?php echo $_SESSION['success_message']; unset($_SESSION['success_message']); ?>
+                <?php echo $_SESSION['success_message'];
+                unset($_SESSION['success_message']); ?>
             </div>
         <?php endif; ?>
         <?php if (isset($_SESSION['error_message'])): ?>
             <div class="alert alert-danger">
-                <?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?>
+                <?php echo $_SESSION['error_message'];
+                unset($_SESSION['error_message']); ?>
             </div>
         <?php endif; ?>
 
@@ -75,7 +86,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             <?php } ?>
         </div>
+        <div class="col-12">
+            <h3>ออเดอร์สั่งกลับบ้าน</h3>
+            <div class="row">
+                <?php while ($row = $result_pickup_orders->fetch_assoc()) { ?>
+                    <div class="col-md-3 mb-4">
+                        <div class="table-card" onclick="goToOrderDetails('<?php echo $row['order_pickup_id']; ?>', 'pickup')">
+                            <h3>รหัสออเดอร์: <?php echo $row['order_pickup_id']; ?></h3>
+                            <p>พนักงาน ID: <?php echo $row['emp_id']; ?></p>
+                            <p>วันที่: <?php echo $row['order_date']; ?></p>
+                        </div>
+                    </div>
+                <?php } ?>
+            </div>
+        </div>
     </div>
+    </div>
+    </div>
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

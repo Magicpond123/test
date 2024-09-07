@@ -138,7 +138,7 @@ if (!$result) {
                                     <?php while ($row = $result->fetch_assoc()) { ?>
                                     <tr>
                                         <td style="text-align: center;"><?php echo $row['category_id']; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['type']; ?></td>
+                                        <td style="text-align: left;"><?php echo $row['type']; ?></td>
                                         <td style="text-align: center;">
                                             <a href="edit_category.php?id=<?php echo $row['category_id']; ?>" class="btn btn-warning btn-sm">Edit</a>
                                             <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['category_id']; ?>">Delete</button>

@@ -16,6 +16,7 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <title>จัดการหน่วย</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -93,6 +94,10 @@ $result = $conn->query($sql);
                             <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
                             จัดการออเดอร์
                         </a>
+                        <a class="nav-link" href="cashier.php">
+                            <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
+                            ชำระเงิน
+                        </a>
                     </div>
                 </div>
                 <div class="sb-sidenav-footer">
@@ -131,7 +136,7 @@ $result = $conn->query($sql);
                                     <?php while ($row = $result->fetch_assoc()) { ?>
                                     <tr>
                                         <td style="text-align: center;"><?php echo $row['unit_id']; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['name']; ?></td>
+                                        <td style="text-align: left;"><?php echo $row['name']; ?></td>
                                         <td style="text-align: center;">
                                             <a href="edit_unit.php?id=<?php echo $row['unit_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
                                             <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['unit_id']; ?>">ลบ</button>

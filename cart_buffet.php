@@ -7,7 +7,9 @@ date_default_timezone_set('Asia/Bangkok');
 if (!isset($_SESSION['cart_buffet'])) {
     $_SESSION['cart_buffet'] = [];
 }
-
+if (!isset($_SESSION['table_id'])) {
+    die("กรุณาเลือกโต๊ะก่อนทำการสั่งอาหาร");
+}
 // Remove item from buffet cart
 if (isset($_POST['remove'])) {
     $itemToRemove = htmlspecialchars($_POST['remove']);
@@ -30,11 +32,12 @@ if (isset($_POST['update_quantity'])) {
 }
 
 // Complete buffet order
+// Complete buffet order
 if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
     $orderSuccess = true;
     $conn->begin_transaction(); // Start transaction
     try {
-        $table_id = 2;
+        $table_id = $_SESSION['table_id']; 
         $emp_id = 2;
         $order_date = date('Y-m-d H:i:s');
         $adults = $_SESSION['adults'];
@@ -68,6 +71,17 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
             $stmt->close();
         }
 
+        // Update table status to unavailable (2)
+        $stmt = $conn->prepare("UPDATE tables SET table_status = 2 WHERE table_id = ?");
+        if ($stmt === false) {
+            throw new Exception("Table status update failed: " . $conn->error);
+        }
+        $stmt->bind_param("i", $table_id);
+        if (!$stmt->execute()) {
+            throw new Exception("Table status update execution failed: " . $stmt->error);
+        }
+        $stmt->close();
+
         // Clear the buffet cart and session variables
         $_SESSION['cart_buffet'] = [];
         $_SESSION['adults'] = 1;
@@ -83,6 +97,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order') {
         echo "Error: " . $e->getMessage(); // Display the error message
     }
 }
+
 ?>
 
 <!DOCTYPE html>

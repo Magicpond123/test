@@ -138,7 +138,7 @@ $result = $conn->query($sql);
                                     <tr>
                                         <td style="text-align: center;"><?php echo $i++; ?></td>
                                         <td style="text-align: center;"><?php echo $row['table_number']; ?></td>
-                                        <td style="text-align: center;"><?php echo $row['table_status'] == 1 ? 'พร้อมใช้งาน' : 'ไม่พร้อมใช้งาน'; ?></td>
+                                        <td style="text-align: left;"><?php echo $row['table_status'] == 1 ? 'พร้อมใช้งาน' : 'ไม่พร้อมใช้งาน'; ?></td>
                                         <td style="text-align: center;">
                                             <a href="edit_table.php?id=<?php echo $row['table_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
                                             <a href="delete_table.php?id=<?php echo $row['table_id']; ?>" class="btn btn-danger btn-sm">ลบ</a>
