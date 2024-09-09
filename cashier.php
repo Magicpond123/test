@@ -2,37 +2,47 @@
 session_start();
 include 'includes/db_connect.php';
 
-// ดึงข้อมูลออเดอร์ในร้าน
-$sql_orders = "SELECT o.order_buffet_id, o.table_id, o.adult, o.child, o.order_date 
-               FROM order_buffet o";
+// Fetch order details from the buffet and pickup orders
+$sql_orders = "SELECT o.order_buffet_id, o.table_id, o.adult, o.child, o.order_date, t.table_number, t.table_status
+               FROM order_buffet o
+               JOIN tables t ON o.table_id = t.table_id";
 $result_orders = $conn->query($sql_orders);
 
-// ดึงข้อมูลออเดอร์สั่งกลับบ้าน
+// Fetch pickup orders
 $sql_pickup_orders = "SELECT o.order_pickup_id, o.emp_id, o.order_date
                       FROM order_pickup o";
 $result_pickup_orders = $conn->query($sql_pickup_orders);
 
-// ตรวจสอบการทำงานของคำสั่ง SQL
+// Check for query execution errors
 if (!$result_orders || !$result_pickup_orders) {
     die("Error executing query: " . $conn->error);
 }
 
-// ประมวลผลข้อมูลเมื่อมีการส่งฟอร์ม
+// Process form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['update_customers'])) {
-        // รับข้อมูลจากฟอร์ม
+        // Get data from form
         $order_id = $_POST['order_id'];
         $ad = $_POST['ad'];
         $hc = $_POST['hc'];
 
-        // อัปเดตข้อมูลในฐานข้อมูล
-        $sql_update = "UPDATE order_buffet SET adult = '$ad', child = '$hc' WHERE order_buffet_id = '$order_id'";
-        if ($conn->query($sql_update) === TRUE) {
-            $_SESSION['success_message'] = "อัปเดตข้อมูลสำเร็จ!";
-        } else {
-            $_SESSION['error_message'] = "เกิดข้อผิดพลาดในการอัปเดตข้อมูล: " . $conn->error;
+        // Update database
+        $sql_update = "UPDATE order_buffet SET adult = ?, child = ? WHERE order_buffet_id = ?";
+        $stmt = $conn->prepare($sql_update);
+        if ($stmt === false) {
+            die('Prepare failed: ' . htmlspecialchars($conn->error));
         }
-        header("Location: cashier.php");
+
+        $stmt->bind_param("iii", $ad, $hc, $order_id);
+        if ($stmt->execute()) {
+            $_SESSION['success_message'] = "Update successful!";
+        } else {
+            $_SESSION['error_message'] = "Update failed: " . $conn->error;
+        }
+        $stmt->close();
+        
+        // Redirect to avoid form resubmission
+        header("Location: manage_orders.php");
         exit();
     }
 }
@@ -46,22 +56,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>จัดการออเดอร์ภายในร้าน</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/cashier.css">
+    <style>
+        .table-card {
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .table-card.occupied {
+            border-color: green;
+            background-color: #e6ffe6;
+        }
+        .table-card:not(.occupied) {
+            border-color: #ccc;
+        }
+    </style>
     <script>
         function goToOrderDetails(orderId, type) {
-        if (type === 'buffet') {
-        window.location.href = 'cashier_details.php?order_id=' + orderId;
-        } else if (type === 'pickup') {
-        window.location.href = 'cashier_details_pickup.php?order_pickup_id=' + orderId;
+            if (type === 'buffet') {
+                window.location.href = 'cashier_details.php?order_id=' + orderId;
+            } else if (type === 'pickup') {
+                window.location.href = 'cashier_details_pickup.php?order_pickup_id=' + orderId;
+            }
         }
-        }
-        </script>
+    </script>
 </head>
 
 <body>
     <div class="container mt-4">
         <h1 class="text-center">จัดการออเดอร์ภายในร้าน</h1>
 
-        <!-- แสดงข้อความสถานะ -->
+        <!-- Display status messages -->
         <?php if (isset($_SESSION['success_message'])): ?>
             <div class="alert alert-success">
                 <?php echo $_SESSION['success_message'];
@@ -78,33 +104,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="row mt-4">
             <?php while ($row = $result_orders->fetch_assoc()) { ?>
                 <div class="col-md-3 mb-4">
-                    <div class="table-card" onclick="goToOrderDetails('<?php echo $row['order_buffet_id']; ?>')">
-                        <h3>โต๊ะ <?php echo $row['table_id']; ?></h3>
-                        <p>จำนวนผู้ใหญ่: <?php echo $row['adult']; ?></p>
-                        <p>จำนวนเด็ก: <?php echo $row['child']; ?></p>
+                    <div class="table-card <?php echo $row['table_status'] == 1 ? 'occupied' : ''; ?>"
+                         onclick="goToOrderDetails('<?php echo htmlspecialchars($row['order_buffet_id']); ?>', 'buffet')">
+                        <h3>โต๊ะ <?php echo htmlspecialchars($row['table_number']); ?></h3>
+                        <p>จำนวนผู้ใหญ่: <?php echo htmlspecialchars($row['adult']); ?></p>
+                        <p>จำนวนเด็ก: <?php echo htmlspecialchars($row['child']); ?></p>
+                        <p>สถานะ: <?php echo $row['table_status'] == 1 ? 'รอชำระเงิน' : 'โต๊ะว่าง'; ?></p>
                     </div>
                 </div>
             <?php } ?>
         </div>
+
         <div class="col-12">
             <h3>ออเดอร์สั่งกลับบ้าน</h3>
             <div class="row">
                 <?php while ($row = $result_pickup_orders->fetch_assoc()) { ?>
                     <div class="col-md-3 mb-4">
-                        <div class="table-card" onclick="goToOrderDetails('<?php echo $row['order_pickup_id']; ?>', 'pickup')">
-                            <h3>รหัสออเดอร์: <?php echo $row['order_pickup_id']; ?></h3>
-                            <p>พนักงาน ID: <?php echo $row['emp_id']; ?></p>
-                            <p>วันที่: <?php echo $row['order_date']; ?></p>
+                        <div class="table-card" onclick="goToOrderDetails('<?php echo htmlspecialchars($row['order_pickup_id']); ?>', 'pickup')">
+                            <h3>รหัสออเดอร์: <?php echo htmlspecialchars($row['order_pickup_id']); ?></h3>
+                            <p>พนักงาน ID: <?php echo htmlspecialchars($row['emp_id']); ?></p>
+                            <p>วันที่: <?php echo htmlspecialchars($row['order_date']); ?></p>
                         </div>
                     </div>
                 <?php } ?>
             </div>
         </div>
     </div>
-    </div>
-    </div>
-
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

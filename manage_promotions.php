@@ -7,12 +7,8 @@ if (!isset($_SESSION['username'])) {
 
 include 'includes/db_connect.php';
 
-// Fetch menu items data
-$sql = "SELECT mi.item_id, mi.name, mi.description, mi.price, mi.image_path, mi.order_type, 
-               c.type AS category, u.name AS unit 
-        FROM menuitems mi 
-        JOIN category c ON mi.category_id = c.category_id 
-        JOIN unit u ON mi.unit_id = u.unit_id";
+// Fetch promotions data
+$sql = "SELECT * FROM promotions";
 $result = $conn->query($sql);
 ?>
 
@@ -21,7 +17,7 @@ $result = $conn->query($sql);
 
 <head>
     <meta charset="UTF-8">
-    <title>Manage Menu</title>
+    <title>Manage Promotions</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -34,21 +30,19 @@ $result = $conn->query($sql);
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
-        function showDetails(itemId) {
+        function showDetails(promotionId) {
             $.ajax({
-                url: "fetch_item_details.php",
+                url: "fetch_promotion_details.php",
                 method: "POST",
-                data: {
-                    id: itemId
-                },
+                data: { id: promotionId },
                 success: function(data) {
-                    $('#itemDetailsModal .modal-body').html(data);
-                    $('#itemDetailsModal').modal('show');
+                    $('#promotionDetailsModal .modal-body').html(data);
+                    $('#promotionDetailsModal').modal('show');
                 }
             });
         }
 
-        function deleteItem(item_id) {
+        function deletePromotion(promotion_id) {
             Swal.fire({
                 title: "คุณต้องการลบหรือไม่?",
                 text: "",
@@ -59,7 +53,7 @@ $result = $conn->query($sql);
                 confirmButtonText: "Yes"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = `delete_menu_item.php?id=${item_id}`;
+                    window.location.href = `delete_promotion.php?id=${promotion_id}`;
                 }
             });
         }
@@ -105,7 +99,7 @@ $result = $conn->query($sql);
         <div id="layoutSidenav_nav">
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
-                    <div class="nav">
+                <div class="nav">
                         <div class="sb-sidenav-menu-heading">หน้าหลัก</div>
                         <a class="nav-link" href="index.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
@@ -153,12 +147,12 @@ $result = $conn->query($sql);
             </nav>
         </div>
 
-        <!-- Modal for item details -->
-        <div class="modal fade" id="itemDetailsModal" tabindex="-1" role="dialog" aria-labelledby="itemDetailsModalLabel" aria-hidden="true">
+        <!-- Modal for promotion details -->
+        <div class="modal fade" id="promotionDetailsModal" tabindex="-1" role="dialog" aria-labelledby="promotionDetailsModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="itemDetailsModalLabel">รายละเอียดรายการอาหาร</h5>
+                        <h5 class="modal-title" id="promotionDetailsModalLabel">รายละเอียดโปรโมชั่น</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -176,26 +170,26 @@ $result = $conn->query($sql);
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">จัดการรายการอาหาร</h1>
+                    <h1 class="mt-4">จัดการโปรโมชั่น</h1>
                     <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item active">จัดการรายการอาหาร</li>
+                        <li class="breadcrumb-item active">จัดการโปรโมชั่น</li>
                     </ol>
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            เพิ่มรายการอาหาร
+                            เพิ่มโปรโมชั่น
                         </div>
                         <div class="card-body">
-                            <a href="add_menu_item.php" class="btn btn-primary mb-3">เพิ่มรายการอาหาร</a>
+                            <a href="add_promotions.php" class="btn btn-primary mb-3">เพิ่มโปรโมชั่น</a>
                             <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th style="text-align: center;">ลำดับ</th>
-                                        <th style="text-align: center;">ชื่อ</th>
-                                        <th style="text-align: center;">ราคา</th>
-                                        <th style="text-align: center;">ประเภท</th>
-                                        <th style="text-align: center;">หน่วย</th>
-                                        <th style="text-align: center;">ชนิด</th>
+                                        <th style="text-align: center;">ชื่อโปรโมชั่น</th>
+                                        <th style="text-align: center;">รายละเอียด</th>
+                                        <th style="text-align: center;">วันที่เริ่ม</th>
+                                        <th style="text-align: center;">วันที่สิ้นสุด</th>
+                                        <th style="text-align: center;">ส่วนลด</th>
                                         <th style="text-align: center;">ปรับแต่ง</th>
                                         <th style="text-align: center;">ดูรายละเอียด</th>
                                     </tr>
@@ -206,30 +200,16 @@ $result = $conn->query($sql);
                                         <tr>
                                             <td style="text-align: center;"><?= $i++; ?></td>
                                             <td style="text-align: left;"><?= htmlspecialchars($row['name']); ?></td>
-                                            <td style="text-align: right;"><?= number_format($row['price'], 2); ?></td>
-                                            <td style="text-align: left;"><?= htmlspecialchars($row['category']); ?></td>
-                                            <td style="text-align: left;"><?= htmlspecialchars($row['unit']); ?></td>
-                                            <td style="text-align: left;">
-                                                <?php
-                                                switch ($row['order_type']) {
-                                                    case 1:
-                                                        echo "บุฟเฟ่ต์";
-                                                        break;
-                                                    case 2:
-                                                        echo "อะลาคาร์ท";
-                                                        break;
-                                                    default:
-                                                        echo "ไม่ทราบประเภท";
-                                                        break;
-                                                }
-                                                ?>
+                                            <td style="text-align: left;"><?= htmlspecialchars($row['description']); ?></td>
+                                            <td style="text-align: center;"><?= htmlspecialchars($row['start_date']); ?></td>
+                                            <td style="text-align: center;"><?= htmlspecialchars($row['end_date']); ?></td>
+                                            <td style="text-align: right;"><?= htmlspecialchars($row['discount']); ?>%</td>
+                                            <td style="text-align: center;">
+                                                <a href="edit_promotion.php?id=<?= $row['promotion_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
+                                                <button class="btn btn-danger btn-sm delete-btn" data-id="<?= $row['promotion_id']; ?>" onclick="deletePromotion(<?= $row['promotion_id']; ?>)">ลบ</button>
                                             </td>
                                             <td style="text-align: center;">
-                                                <a href="edit_menu_item.php?id=<?= $row['item_id']; ?>" class="btn btn-warning btn-sm">แก้ไข</a>
-                                                <button class="btn btn-danger btn-sm delete-btn" data-id="<?= $row['item_id']; ?>" onclick="deleteItem(<?= $row['item_id']; ?>)">ลบ</button>
-                                            </td>
-                                            <td style="text-align: center;">
-                                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="showDetails(<?= $row['item_id']; ?>)">ดูรายละเอียด</a>
+                                                <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="showDetails(<?= $row['promotion_id']; ?>)">ดูรายละเอียด</a>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>

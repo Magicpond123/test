@@ -122,6 +122,10 @@ $result = $conn->query($sql);
                             <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
                             ชำระเงิน
                         </a>
+                        <a class="nav-link" href="manage_promotions.php">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tags"></i></div>
+                            จัดการโปรโมชั่น
+                        </a>
                     </div>
                 </div>
                 <div class="sb-sidenav-footer">

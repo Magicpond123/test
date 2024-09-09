@@ -1,8 +1,8 @@
 <?php
 include 'phpqrcode/qrlib.php';
 
-$table_id = 3;
-$url = "172.16.2.189:8000/menu_order_buffet.php" . $table_id;
+$table_id = 1;
+$url = "http://localhost/test/menu_order_buffet_customer.php" . $table_id;
 $filename = "qrcodes/table_$table_id.png";
 
 // สร้างโฟลเดอร์ qrcodes ถ้าไม่มี

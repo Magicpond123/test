@@ -7,6 +7,7 @@ if (!isset($_SESSION['username'])) {
 include 'includes/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Update employee details
     $emp_id = $_POST['emp_id'];
     $username = $_POST['username'];
     $firstname = $_POST['firstname'];
@@ -23,12 +24,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
 } else {
-    $emp_id = $_GET['id'];
-    $sql = "SELECT * FROM employees WHERE emp_id='$emp_id'";
-    $result = $conn->query($sql);
-    $row = $result->fetch_assoc();
+    // Retrieve employee data for editing
+    $emp_id = $_GET['id'] ?? null;
+
+    if ($emp_id) {
+        $sql = "SELECT * FROM employees WHERE emp_id='$emp_id'";
+        $result = $conn->query($sql);
+
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+        } else {
+            echo "ไม่พบพนักงานที่ต้องการแก้ไข";
+            exit();
+        }
+    } else {
+        echo "ไม่พบพารามิเตอร์ ID";
+        exit();
+    }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,21 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <script>
-        function checker() {
-            var result = confirm('คุณต้องการออกจากระบบหรือไม่?');
-            if (result == false) {
-                event.preventDefault();
-            }
-        }
-    </script>
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
     <!-- Bootstrap JS -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
@@ -63,13 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="d-flex ms-auto me-0 me-md-3 my-2 my-md-0 input-group">
                 <input list="menuitems" name="query" class="form-control" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
                 <datalist id="menuitems">
-                    <?php
-                    if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            echo "<option value='" . htmlspecialchars($row['name']) . " - " . htmlspecialchars($row['price']) . " บาท'>";
-                        }
-                    }
-                    ?>
+                    <!-- Query logic for fetching menu items -->
                 </datalist>
             </div>
         </form>
@@ -77,27 +73,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-user fa-fw"></i>
-                    <?php if (isset($_SESSION['username'])) : ?>
-                        <?php echo $_SESSION['username']; ?>
-                    <?php else : ?>
-                        Guest
-                    <?php endif; ?>
+                    <?php echo $_SESSION['username'] ?? 'Guest'; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <?php if (isset($_SESSION['username'])) : ?>
-                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                    <?php else : ?>
-                        <li><a class="dropdown-item" href="login.php">Login</a></li>
-                    <?php endif; ?>
+                    <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                 </ul>
             </li>
         </ul>
     </nav>
+
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
-                    <div class="nav">
+                <div class="nav">
                         <div class="sb-sidenav-menu-heading">หน้าหลัก</div>
                         <a class="nav-link" href="index.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
@@ -120,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="sb-nav-link-icon"><i class="fas fa-balance-scale"></i></div>
                             จัดการหน่วย
                         </a>
-                        <a class="nav-link" href="table.php">
+                        <a class="nav-link" href="manage_tables.php">
                             <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                             จัดการโต๊ะ
                         </a>
@@ -136,14 +125,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                    <?php if (isset($_SESSION['username'])) : ?>
-                        <?php echo $_SESSION['username']; ?>
-                    <?php else : ?>
-                        Guest
-                    <?php endif; ?>
+                    <?php echo $_SESSION['username'] ?? 'Guest'; ?>
                 </div>
             </nav>
         </div>
+
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
@@ -159,42 +145,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
                         <div class="card-body">
                             <form action="edit_employee.php" method="post">
-                                <input type="hidden" name="emp_id" value="<?php echo $row['emp_id']; ?>">
+                                <input type="hidden" name="emp_id" value="<?php echo $row['emp_id'] ?? ''; ?>">
                                 <div class="form-group mb-3">
                                     <label for="username">Username:</label>
-                                    <input type="text" class="form-control" id="username" name="username" value="<?php echo $row['username']; ?>" required>
+                                    <input type="text" class="form-control" id="username" name="username" value="<?php echo $row['username'] ?? ''; ?>" required>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="firstname">First Name:</label>
-                                    <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo $row['firstname']; ?>" required>
+                                    <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo $row['firstname'] ?? ''; ?>" required>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="lastname">Last Name:</label>
-                                    <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo $row['lastname']; ?>" required>
+                                    <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo $row['lastname'] ?? ''; ?>" required>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="email">Email:</label>
-                                    <input type="email" class="form-control" id="email" name="email" value="<?php echo $row['mail']; ?>" required>
+                                    <input type="email" class="form-control" id="email" name="email" value="<?php echo $row['mail'] ?? ''; ?>" required>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="location">Location:</label>
-                                    <textarea class="form-control" id="location" name="location" required><?php echo $row['location']; ?></textarea>
+                                    <textarea class="form-control" id="location" name="location" required><?php echo $row['location'] ?? ''; ?></textarea>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="role">Role:</label>
                                     <select class="form-control" id="role" name="role" required>
-                                        <option value="1" <?php if ($row['role'] == 1) echo 'selected'; ?>>เจ้าของ</option>
-                                        <option value="2" <?php if ($row['role'] == 2) echo 'selected'; ?>>แคชเชียร์</option>
-                                        <option value="3" <?php if ($row['role'] == 3) echo 'selected'; ?>>พนักงานต้อนรับ</option>
-                                        <option value="4" <?php if ($row['role'] == 4) echo 'selected'; ?>>พนักงานครัว</option>
+                                        <option value="1" <?php echo ($row['role'] == 1) ? 'selected' : ''; ?>>เจ้าของ</option>
+                                        <option value="2" <?php echo ($row['role'] == 2) ? 'selected' : ''; ?>>แคชเชียร์</option>
+                                        <option value="3" <?php echo ($row['role'] == 3) ? 'selected' : ''; ?>>พนักงานต้อนรับ</option>
+                                        <option value="4" <?php echo ($row['role'] == 4) ? 'selected' : ''; ?>>พนักงานครัว</option>
                                     </select>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="status">Status:</label>
                                     <select class="form-control" id="status" name="status" required>
-                                        <option value="1" <?php if ($row['status'] == 1) echo 'selected'; ?>>ออนไลน์</option>
-                                        <option value="2" <?php if ($row['status'] == 2) echo 'selected'; ?>>ออฟไลน์</option>
-                                        <option value="3" <?php if ($row['status'] == 3) echo 'selected'; ?>>ลาออก</option>
+                                        <option value="1" <?php echo ($row['status'] == 1) ? 'selected' : ''; ?>>ออนไลน์</option>
+                                        <option value="2" <?php echo ($row['status'] == 2) ? 'selected' : ''; ?>>ออฟไลน์</option>
+                                        <option value="3" <?php echo ($row['status'] == 3) ? 'selected' : ''; ?>>ลาออก</option>
                                     </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Update Employee</button>
@@ -217,6 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </footer>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
 </body>

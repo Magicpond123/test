@@ -2,43 +2,8 @@
 session_start();
 include 'includes/db_connect.php';
 
-// ตรวจสอบว่าเข้าสู่ระบบแล้วหรือยัง
-if (!isset($_SESSION['username'])) {
-    header("Location: login.php");
-    exit();
-}
-
-// ดึงข้อมูลพนักงานจากฐานข้อมูล
-$username = $_SESSION['username'];
-$sql = "SELECT * FROM employees WHERE username = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows > 0) {
-    $employee = $result->fetch_assoc();
-
-    // ตรวจสอบสิทธิ์ (role) ของผู้ใช้ว่าตรงกับ role 3 (พนักงานต้อนรับ) หรือไม่
-    if ($employee['role'] != 3) {
-        echo "คุณไม่มีสิทธิ์เข้าถึงหน้านี้";
-        exit();
-    }
-} else {
-    echo "ไม่พบข้อมูลพนักงาน";
-    exit();
-}
-
-// ตรวจสอบว่าผู้ใช้เลือกโต๊ะแล้วหรือยัง
-if (isset($_POST['table_id']) && !empty($_POST['table_id'])) {
-    $_SESSION['table_id'] = $_POST['table_id'];
-    header("Location: menu_order_buffet.php"); // ไปยังหน้าสั่งอาหาร
-    exit();
-}
-
-// Query ดึงข้อมูลโต๊ะ
-$sql_tables = "SELECT table_id, table_number FROM tables WHERE table_status = 1";
-$result_tables = $conn->query($sql_tables);
+// กำหนดค่า table_id เป็น 1 โดยอัตโนมัติสำหรับลูกค้า
+$_SESSION['table_id'] = 1; // กำหนดโต๊ะเป็นหมายเลข 1
 
 // จัดการตะกร้าสินค้า
 if (isset($_POST['add_to_cart'])) {
@@ -73,10 +38,6 @@ $result_drink = $conn->query($sql_drink);
 $sql_dessert = "SELECT * FROM menuitems WHERE category_id = 3 AND order_type = 1";
 $result_dessert = $conn->query($sql_dessert);
 
-// Query ดึงข้อมูลโต๊ะ
-$sql_tables = "SELECT table_id, table_number FROM tables WHERE table_status = 1";
-$result_tables = $conn->query($sql_tables);
-
 if (isset($_POST['update_customer_count'])) {
     $_SESSION['adults'] = (int) $_POST['adults'];
     $_SESSION['children'] = (int) $_POST['children'];
@@ -87,10 +48,9 @@ if (isset($_POST['update_customer_count'])) {
     $_SESSION['price_adults'] = $price_adults;
     $_SESSION['price_children'] = $price_children;
 
-    header("Location: menu_order_buffet.php");
+    header("Location: menu_order_buffet_customer.php");
     exit();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -99,7 +59,7 @@ if (isset($_POST['update_customer_count'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เมนูบุฟเฟ่ต์สำหรับพนักงานต้อนรับ</title>
+    <title>เมนูบุฟเฟ่ต์</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="css/menu_order.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -108,7 +68,7 @@ if (isset($_POST['update_customer_count'])) {
             var quantity = $('#quantity-' + itemId).val();
             $.ajax({
                 type: 'POST',
-                url: 'menu_order_buffet.php',
+                url: 'menu_order_buffet_customer.php',
                 data: {
                     item_id: itemId,
                     quantity: quantity,
@@ -150,40 +110,46 @@ if (isset($_POST['update_customer_count'])) {
             var x = document.getElementsByClassName("menu-items");
             var tabs = document.getElementsByClassName("tab");
 
+            // ซ่อนทุกแท็บ
             for (i = 0; i < x.length; i++) {
-                x[i].style.display = "none"; // ซ่อนทุกแท็บ
+                x[i].style.display = "none";
             }
 
+            // ลบคลาส active จากแท็บทั้งหมด
             for (i = 0; i < tabs.length; i++) {
-                tabs[i].classList.remove("active"); // ลบคลาส active จากทุกแท็บ
+                tabs[i].classList.remove("active");
             }
 
-            document.getElementById(tabName).style.display = "flex"; // แสดงแท็บที่ถูกเลือก
-            event.currentTarget.classList.add("active"); // เพิ่มคลาส active ให้แท็บที่ถูกคลิก
+            // แสดงแท็บที่ถูกเลือกและเพิ่มคลาส active
+            document.getElementById(tabName).style.display = "flex";
+            event.currentTarget.classList.add("active");
         }
     </script>
+    <style>
+        .table-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #ff4444;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            z-index: 999;
+        }
+
+        #customer-count-form {
+            display: none;
+        }
+    </style>
 </head>
+<div class="table-icon">
+    <i class="fas fa-utensils"></i> 1
+</div>
 
 <body>
     <header class="navbar">
         <img src="img/logo.jpg" alt="Logo">
-        <div class="table-dropdown">
-            <form action="menu_order_buffet.php" method="POST">
-                <label for="table_id">เลือกโต๊ะ:</label>
-                <select name="table_id" id="table_id" onchange="this.form.submit()">
-                    <?php
-                    if ($result_tables->num_rows > 0) {
-                        while ($row = $result_tables->fetch_assoc()) {
-                            $selected = (isset($_SESSION['table_id']) && $_SESSION['table_id'] == $row['table_id']) ? 'selected' : '';
-                            echo "<option value='" . htmlspecialchars($row['table_id']) . "' $selected>โต๊ะ " . htmlspecialchars($row['table_number']) . "</option>";
-                        }
-                    } else {
-                        echo "<option value=''>ไม่มีโต๊ะว่าง</option>";
-                    }
-                    ?>
-                </select>
-            </form>
-        </div>
     </header>
 
     <div class="tab-container">
@@ -192,19 +158,8 @@ if (isset($_POST['update_customer_count'])) {
         <div class="tab" onclick="openTab(event, 'menu_dessert')">ของหวาน</div>
     </div>
 
-
     <main>
-        <div id=pd>
-            <form id="customer-count-form" action="menu_order_buffet.php" method="POST">
-                <label for="adults">จำนวนผู้ใหญ่:</label>
-                <input type="number" id="adults" name="adults" value="<?php echo isset($_SESSION['adults']) ? $_SESSION['adults'] : 1; ?>" min="1">
-                <label for="children">จำนวนเด็ก:</label>
-                <input type="number" id="children" name="children" value="<?php echo isset($_SESSION['children']) ? $_SESSION['children'] : 0; ?>" min="0">
-                <div id="btn">
-                    <button type="submit" name="update_customer_count">อัปเดตจำนวนลูกค้า</button>
-                </div>
-            </form>
-        </div>
+        <!-- เมนูอาหาร -->
         <section id="menu_food" class="menu-items" style="display: flex;">
             <?php while ($row = $result_food->fetch_assoc()) { ?>
                 <div class="menu-item">
@@ -270,6 +225,7 @@ if (isset($_POST['update_customer_count'])) {
         <i class="fas fa-shopping-cart"></i>
         <div class="badge"><?php echo isset($_SESSION['cart_buffet']) ? array_sum(array_column($_SESSION['cart_buffet'], 'quantity')) : 0; ?></div>
     </a>
+
 </body>
 
 </html>
