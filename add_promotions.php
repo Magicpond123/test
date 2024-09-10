@@ -12,34 +12,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $description = $_POST['description'];
     $start_date = $_POST['start_date'];
     $end_date = $_POST['end_date'];
+    $type = $_POST['type'];
+    $rule_person = $_POST['rule_person'];
     $discount = $_POST['discount'];
-    $rule_type = $_POST['rule_type'];
+    $discount_percent = $_POST['discount_percent'];
 
-    // เตรียมข้อมูล rule_data ตามประเภทของโปรโมชั่น
-    if ($rule_type == 'quantity_discount') {
-        // กรณีโปรโมชั่นมา 4 จ่าย 3
-        $required_quantity = $_POST['required_quantity'] ?? 0;
-        $free_quantity = $_POST['free_quantity'] ?? 0;
-        $rule_data = json_encode([
-            'required_quantity' => $required_quantity,
-            'free_quantity' => $free_quantity
-        ]);
-    } elseif ($rule_type == 'birthday_discount') {
-        // กรณีโปรโมชั่นวันเกิด
-        $birthday_discount_percentage = $_POST['birthday_discount_percentage'] ?? 0;
-        $rule_data = json_encode([
-            'birthday_discount_percentage' => $birthday_discount_percentage
-        ]);
-    } else {
-        // กรณีโปรโมชั่นแบบส่วนลดทั่วไป
-        $rule_data = json_encode([]);
-    }
-
-    // Insert new promotion into database
-    $sql = "INSERT INTO promotions (name, description, start_date, end_date, discount, rule_type, rule_data) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO promotions (name, description, start_date, end_date, discount, discount_percent, type, rule_person) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssssiss", $name, $description, $start_date, $end_date, $discount, $rule_type, $rule_data);
+    $stmt->bind_param("sssisssi", $name, $description, $start_date, $end_date, $discount, $discount_percent, $type, $rule_person);
+
 
     if ($stmt->execute()) {
         header("Location: manage_promotions.php");
@@ -143,48 +125,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="card-body">
                             <form action="add_promotions.php" method="POST">
                                 <div class="mb-3">
-                                    <label for="name" class="form-label">ชื่อโปรโมชั่น</label>
+                                    <label for="type" class="form-label">ประเภทของโปรโมชั่น</label>
+                                    <select class="form-control" id="type" name="type" required>
+                                        <option value="discount-type-person">ส่วนลดตามจำนวนคน</option>
+                                        <option value="discount-type-birthday">ส่วนลดวันเกิด</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">ชื่อโปรโมชั่น <span style="color:red"> *</span></label>
                                     <input type="text" class="form-control" id="name" name="name" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="description" class="form-label">รายละเอียดโปรโมชั่น</label>
+                                    <label for="description" class="form-label">รายละเอียดโปรโมชั่น <span style="color:red"> *</label>
                                     <textarea class="form-control" id="description" name="description" required></textarea>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="start_date" class="form-label">วันที่เริ่ม</label>
+                                    <label for="start_date" class="form-label">วันที่เริ่ม <span style="color:red"> *</label>
                                     <input type="date" class="form-control" id="start_date" name="start_date" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="end_date" class="form-label">วันที่สิ้นสุด</label>
+                                    <label for="end_date" class="form-label">วันที่สิ้นสุด <span style="color:red"> *</label>
                                     <input type="date" class="form-control" id="end_date" name="end_date" required>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="discount" class="form-label">ส่วนลด (%)</label>
-                                    <input type="number" class="form-control" id="discount" name="discount" required>
-                                </div>
+                                <div class="discount-type" id="discount-type-birthday" style="display:none;">
+                                    <div class="mb-3">
+                                        <label for="discount_percent" class="form-label">ส่วนลด (%)</label>
+                                        <input type="number" class="form-control" id="discount_percent" name="discount_percent" min="0" value="0">
 
-                                <!-- ส่วนของ rule_type และ rule_data -->
-                                <div class="mb-3">
-                                    <label for="rule_type" class="form-label">ประเภทของโปรโมชั่น</label>
-                                    <select class="form-control" id="rule_type" name="rule_type" required onchange="updateRuleDataFields()">
-                                        <option value="quantity_discount">มา 4 จ่าย 3</option>
-                                        <option value="birthday_discount">ส่วนลดวันเกิด</option>
-                                    </select>
-                                </div>
-
-                                <!-- Dynamic input fields for rule_data -->
-                                <div id="rule_data_fields">
-                                    <div class="mb-3" id="quantity_discount_fields" style="display: none;">
-                                        <label for="required_quantity" class="form-label">จำนวนลูกค้า:</label>
-                                        <input type="number" class="form-control" id="required_quantity" name="required_quantity">
-                                        <label for="free_quantity" class="form-label">จำนวนฟรี:</label>
-                                        <input type="number" class="form-control" id="free_quantity" name="free_quantity">
                                     </div>
-                                    <div class="mb-3" id="birthday_discount_fields" style="display: none;">
-                                        <label for="required_quantity" class="form-label">จำนวนลูกค้า:</label>
-                                        <input type="number" class="form-control" id="required_quantity" name="required_quantity">
-                                        <label for="free_quantity" class="form-label">จำนวนฟรี:</label>
-                                        <input type="number" class="form-control" id="free_quantity" name="free_quantity">
+                                </div>
+                                <div class="discount-type" id="discount-type-person">
+                                    <div class="mb-3">
+                                        <label for="discount" class="form-label">ส่วนลด</label>
+                                        <input type="number" class="form-control" id="discount" name="discount" min="0" value="0">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="rule_person" class="form-label">จำนวนคน</label>
+                                        <input type="number" class="form-control" id="rule_person" name="rule_person" min="0" value="0">
                                     </div>
                                 </div>
 
@@ -198,15 +175,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <script>
-        // Function to show/hide input fields based on rule_type selection
-        function updateRuleDataFields() {
-            const ruleType = document.getElementById('rule_type').value;
-            document.getElementById('quantity_discount_fields').style.display = ruleType === 'quantity_discount' ? 'block' : 'none';
-            document.getElementById('birthday_discount_fields').style.display = ruleType === 'birthday_discount' ? 'block' : 'none';
-        }
-
-        // Initialize fields visibility on page load
-        updateRuleDataFields();
+        $(document).ready(function() {
+            $("#type").change(function() {
+                var type = $(this).val();
+                $(".discount-type").hide()
+                $('#' + type).show()
+            });
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>

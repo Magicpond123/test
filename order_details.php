@@ -29,6 +29,7 @@ if ($result === false) {
 
 // Status options
 $status_options = [
+    0 => 'ไม่ระบุสถานะ',
     1 => 'รอดำเนินการ',
     2 => 'กำลังดำเนินการ',
     3 => 'จัดส่งแล้ว',
@@ -47,9 +48,9 @@ if (isset($_POST['update_status'])) {
 
     $update_stmt->bind_param("sii", $new_status, $order_buffet_id, $item_id);
     if ($update_stmt->execute()) {
-        echo "<script>alert('สถานะออเดอร์ถูกอัปเดตแล้ว');</script>";
+        $_SESSION['success_message'] = "สถานะออเดอร์ถูกอัปเดตแล้ว";
     } else {
-        echo "<script>alert('เกิดข้อผิดพลาดในการอัปเดตสถานะ');</script>";
+        $_SESSION['error_message'] = "เกิดข้อผิดพลาดในการอัปเดตสถานะ";
     }
     $update_stmt->close();
     
@@ -64,11 +65,30 @@ if (isset($_POST['update_status'])) {
     <meta charset="UTF-8">
     <title>Order Details</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/order_details.css"> <!-- ลิงก์ไปยังไฟล์ CSS -->
+    <link rel="stylesheet" href="css/order_details.css">
 </head>
 <body>
     <div class="container mt-5">
         <h2>รายละเอียดออเดอร์ #<?php echo $order_buffet_id; ?></h2>
+        
+        <?php if (isset($_SESSION['success_message'])): ?>
+            <div class="alert alert-success">
+                <?php 
+                echo $_SESSION['success_message'];
+                unset($_SESSION['success_message']);
+                ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['error_message'])): ?>
+            <div class="alert alert-danger">
+                <?php 
+                echo $_SESSION['error_message'];
+                unset($_SESSION['error_message']);
+                ?>
+            </div>
+        <?php endif; ?>
+
         <table class="table table-bordered">
             <thead>
                 <tr>

@@ -3,9 +3,10 @@ session_start();
 include 'includes/db_connect.php';
 
 // Fetch order details from the buffet and pickup orders
-$sql_orders = "SELECT o.order_buffet_id, o.table_id, o.adult, o.child, o.order_date, t.table_number, t.table_status
+$sql_orders = "SELECT o.order_buffet_id, o.table_id, o.adult, o.child, o.order_date, t.table_number, t.table_status, o.payment_status
                FROM order_buffet o
-               JOIN tables t ON o.table_id = t.table_id";
+               JOIN tables t ON o.table_id = t.table_id
+               WHERE o.payment_status = 0";
 $result_orders = $conn->query($sql_orders);
 
 // Fetch pickup orders
@@ -40,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['error_message'] = "Update failed: " . $conn->error;
         }
         $stmt->close();
-        
+
         // Redirect to avoid form resubmission
         header("Location: manage_orders.php");
         exit();
@@ -58,16 +59,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="css/cashier.css">
     <style>
         .table-card {
-            border: 2px solid #ccc;
+            border: 2px solid green;
             border-radius: 10px;
             padding: 15px;
             text-align: center;
             cursor: pointer;
+            background-color: #e6ffe6;
         }
+
         .table-card.occupied {
             border-color: green;
             background-color: #e6ffe6;
         }
+
         .table-card:not(.occupied) {
             border-color: #ccc;
         }
@@ -102,17 +106,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endif; ?>
 
         <div class="row mt-4">
-            <?php while ($row = $result_orders->fetch_assoc()) { ?>
-                <div class="col-md-3 mb-4">
-                    <div class="table-card <?php echo $row['table_status'] == 1 ? 'occupied' : ''; ?>"
-                         onclick="goToOrderDetails('<?php echo htmlspecialchars($row['order_buffet_id']); ?>', 'buffet')">
-                        <h3>โต๊ะ <?php echo htmlspecialchars($row['table_number']); ?></h3>
-                        <p>จำนวนผู้ใหญ่: <?php echo htmlspecialchars($row['adult']); ?></p>
-                        <p>จำนวนเด็ก: <?php echo htmlspecialchars($row['child']); ?></p>
-                        <p>สถานะ: <?php echo $row['table_status'] == 1 ? 'รอชำระเงิน' : 'โต๊ะว่าง'; ?></p>
+            <?php while ($row = $result_orders->fetch_assoc()) {
+                if ($row['payment_status'] == 0) { ?>
+                    <div class="col-md-3 mb-4">
+                        <div class="table-card occupied" onclick="goToOrderDetails('<?php echo htmlspecialchars($row['order_buffet_id']); ?>', 'buffet')">
+                            <h3>โต๊ะ <?php echo htmlspecialchars($row['table_number']); ?></h3>
+                            <p>จำนวนผู้ใหญ่: <?php echo htmlspecialchars($row['adult']); ?></p>
+                            <p>จำนวนเด็ก: <?php echo htmlspecialchars($row['child']); ?></p>
+                            <p>สถานะ: รอชำระเงิน</p>
+                        </div>
                     </div>
-                </div>
-            <?php } ?>
+            <?php }
+            } ?>
         </div>
 
         <div class="col-12">

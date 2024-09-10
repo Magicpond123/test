@@ -7,9 +7,10 @@ if (!isset($_SESSION['username'])) {
 include 'includes/db_connect.php';
 
 // ดึงข้อมูลจาก order_buffet (บุฟเฟ่ต์)
-$sql_buffet = "SELECT o.order_buffet_id, o.table_id, e.firstname, e.lastname, o.order_date, o.child, o.adult, o.price_adult, o.price_child 
+$sql_buffet = "SELECT o.order_buffet_id, o.table_id, e.firstname, e.lastname, o.order_date, o.child, o.adult, o.price_adult, o.price_child, o.payment_status
                FROM order_buffet o
-               JOIN employees e ON o.emp_id = e.emp_id";
+               JOIN employees e ON o.emp_id = e.emp_id
+               WHERE o.payment_status = 0";
 $result_buffet = $conn->query($sql_buffet);
 
 // ดึงข้อมูลจาก order_pickup (อะลาคาร์ท)
@@ -149,6 +150,7 @@ $result_alacarte = $conn->query($sql_alacarte);
                                         <th style="text-align: center;">จำนวนเด็ก</th>
                                         <th style="text-align: center;">ราคาผู้ใหญ่</th>
                                         <th style="text-align: center;">ราคาเด็ก</th>
+                                        <th style="text-align: center;">สถานะ</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -162,6 +164,7 @@ $result_alacarte = $conn->query($sql_alacarte);
                                             <td style="text-align: center;"><?php echo $row['adult']; ?></td>
                                             <td style="text-align: right;"><?php echo $row['price_adult']; ?></td>
                                             <td style="text-align: right;"><?php echo $row['price_child']; ?></td>
+                                            <td style="text-align: center;"><?php echo $row['payment_status'] == 0 ? 'รอชำระเงิน' : 'ชำระเงินแล้ว'; ?></td>
                                             <td style="text-align: center;">
                                                 <a href="order_details.php?order_buffet_id=<?php echo $row['order_buffet_id']; ?>" class="btn btn-info">
                                                     ดูรายละเอียด
